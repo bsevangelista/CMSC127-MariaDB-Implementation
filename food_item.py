@@ -1,3 +1,50 @@
+import server
+
+def add_food_item():
+    try:
+        establishment_id = input("Enter Establishment ID: ").strip()
+        food_name = input("Enter Food Name: ").strip()
+        price = input("Enter Price: ").strip()
+        rating = input("Enter Rating (1-5): ").strip()
+
+        server.addFoodItem(establishment_id, food_name, price, rating)
+        print("Food Item added successfully!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def update_food_item():
+    try:
+        food_id = input("Enter Food ID to update: ").strip()
+        food_name = input("Enter new Food Name: ").strip()
+        price = input("Enter new Price: ").strip()
+        rating = input("Enter new Rating (1-5): ").strip()
+
+        server.updateFoodItem(food_id, food_name, price, rating)
+        print("Food Item updated successfully!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def delete_food_item():
+    try:
+        food_id = input("Enter Food ID to delete: ").strip()
+        server.deleteFoodItem(food_id)
+        print("Food Item deleted successfully!")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def search_food_item():
+    try:
+        search_term = input("Enter search term (name, price, etc.): ").strip()
+        results = server.searchFoodItem(search_term)
+        
+        if results:
+            for result in results:
+                print(result)
+        else:
+            print("No matching food items found.")
+    except Exception as e:
+        print(f"Error: {e}")
+
 def home():
     while True:
         print("----------------Food Item-----------------")
@@ -13,16 +60,15 @@ def home():
             break
         elif choice == 1:
             print("Add Food Item selected.")
-            # Add code to handle adding a review here
+            add_food_item()
         elif choice == 2:
             print("Update Food Item selected.")
-            # Add code to handle updating a review here
+            update_food_item()
         elif choice == 3:
             print("Delete Food Item selected.")
-            # Add code to handle deleting a review here
+            delete_food_item()
         elif choice == 4:
             print("Search Food Item selected.")
-            # Add code to handle deleting a review here    
+            search_food_item()    
         else:
             print("Invalid option. Please try again.")
-            
