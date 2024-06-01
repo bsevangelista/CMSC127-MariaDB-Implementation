@@ -152,7 +152,36 @@ def checkEmailExists(email):
 
 
 ########## ADMIN FUNCTIONS ##########
-
+def admin_signIn(email, password):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT email FROM ADMIN WHERE email = %s AND password = %s
+        """
+        
+        cursor.execute(query, (email, password))
+        rows = cursor.fetchall()
+        
+        if rows:
+            print("Admin Sign In successful!")
+            return True  # Sign-in successful
+        else:
+            print("Invalid email or password.")
+            return False  # Sign-in failed
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
 
 
 
