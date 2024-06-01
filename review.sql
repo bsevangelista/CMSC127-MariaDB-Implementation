@@ -118,9 +118,11 @@ CREATE TRIGGER update_average_rating
 AFTER INSERT ON FOOD_REVIEW
 FOR EACH ROW
 BEGIN
-    DECLARE avg_rating FLOAT;
-    SELECT AVG(Rating) INTO avg_rating FROM FOOD_REVIEW WHERE Establishment_id = NEW.Establishment_id;
-    UPDATE FOOD_ESTABLISHMENT SET Rating = avg_rating WHERE Establishment_id = NEW.Establishment_id;
+    IF NEW.Establishment_id IS NOT NULL AND NEW.Food_id IS NULL THEN
+        DECLARE avg_rating FLOAT;
+        SELECT AVG(Rating) INTO avg_rating FROM FOOD_REVIEW WHERE Establishment_id = NEW.Establishment_id;
+        UPDATE FOOD_ESTABLISHMENT SET Rating = avg_rating WHERE Establishment_id = NEW.Establishment_id;
+    END IF;
 END;
 //
 DELIMITER ;
@@ -147,6 +149,21 @@ BEGIN
     DECLARE avg_rating FLOAT;
     SELECT AVG(Rating) INTO avg_rating FROM FOOD_REVIEW WHERE Establishment_id = OLD.Establishment_id;
     UPDATE FOOD_ESTABLISHMENT SET Rating = avg_rating WHERE Establishment_id = OLD.Establishment_id;
+END;
+//
+DELIMITER ;
+
+-- Trigger to update the average rating in FOOD_ITEM when a FOOD_REVIEW is inserted
+DELIMITER //
+CREATE TRIGGER update_food_item_rating
+AFTER INSERT ON FOOD_REVIEW
+FOR EACH ROW
+BEGIN
+    IF NEW.Food_id IS NOT NULL THEN
+        DECLARE avg_rating FLOAT;
+        SELECT AVG(Rating) INTO avg_rating FROM FOOD_REVIEW WHERE Food_id = NEW.Food_id;
+        UPDATE FOOD_ITEM SET Rating = avg_rating WHERE Food_id = NEW.Food_id;
+    END IF;
 END;
 //
 DELIMITER ;
