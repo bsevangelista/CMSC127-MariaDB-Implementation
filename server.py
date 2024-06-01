@@ -426,7 +426,7 @@ def getEstablishmentIdByName(establishmment_name):
         cursor.close()
         connection.close()
         
-def getItemIdByName(item_name):
+def getItemIdByName(item_name, establishment_id):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -436,10 +436,10 @@ def getItemIdByName(item_name):
         cursor = connection.cursor()
         
         query = """
-        SELECT Food_id FROM FOOD_ITEM WHERE Food_name = %s
+        SELECT Food_id FROM FOOD_ITEM WHERE Food_name = %s AND Establishment_id = %s
         """
         
-        cursor.execute(query, (item_name,))
+        cursor.execute(query, (item_name, establishment_id))
         result = cursor.fetchone()
         
         if result:

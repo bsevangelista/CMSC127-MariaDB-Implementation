@@ -6,8 +6,8 @@ def get_customer_id(email):
 def get_establishment_id(establishment_name):
     return server.getEstablishmentIdByName(establishment_name)
 
-def get_item_id(item_name):
-    return server.getItemIdByName(item_name)
+def get_item_id(item_name, establishment_id):
+    return server.getItemIdByName(item_name, establishment_id)
 
 def get_all_establishment():
     return server.getFoodEstablishmentName()
@@ -126,8 +126,9 @@ def add_food_item_review(customer_id):
             if not item_name:
                 print("Item Name Required!")
                 continue
-            item_id = get_item_id(item_name)
-            if not establishment_id:
+            item_id = get_item_id(item_name, establishment_id)
+            print(item_id)
+            if not item_id:
                 print("Item Not Found!")
                 continue
             break
@@ -187,8 +188,11 @@ def home(customer_id):
         elif choice == '3':
             print("Delete Review selected.")
             # Add code to handle deleting a review here
+        elif choice == '4':
+            print("Delete Review selected.")
+            # Add code to handle deleting a review here
         else:
             print("Invalid option. Please try again.")
         
 # for testing only
-# add_food_item_review(6)
+add_food_item_review(6)
