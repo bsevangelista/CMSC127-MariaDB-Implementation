@@ -4,6 +4,9 @@ import re
 import review
 from datetime import datetime
 
+def get_customer_id(email):
+    return server.getCustomerIdByEmail(email)
+
 def is_valid_email(email):
     # regex for validating an email address
     email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -32,10 +35,11 @@ def user_signIn():
         break
     
     result = server.user_signIn(email, password)
+    customer_id = get_customer_id(email)
     
     if result == 'success':
         print("Sign In successful!")
-        review.home()
+        review.home(customer_id)
     elif result == 'email_not_found':
         print("Email not found. Please sign up.")
     elif result == 'incorrect_password':

@@ -308,3 +308,61 @@ def searchFoodEstablishment(search_term):
         cursor.close()
         connection.close()
 
+############## FOOD REVIEW FUNCTIONS ####################
+def getFoodEstablishmentName():
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT Estab_name FROM FOOD_ESTABLISHMENT
+        """
+        
+        cursor.execute(query)
+        results = cursor.fetchall()
+        
+        if results:
+            return [row[0] for row in results]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+def getCustomerIdByEmail(email):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT Customer_id FROM CUSTOMER WHERE Email = %s
+        """
+        
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            return result[0]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
