@@ -1,4 +1,4 @@
-CREATE DATABASE FoodReviewDB;
+CREATE DATABASE IF NOT EXISTS FoodReviewDB;
 USE FoodReviewDB;
 
 -- Table for CUSTOMER
@@ -62,8 +62,8 @@ CREATE TABLE FOOD_ITEM_INGREDIENT (
     PRIMARY KEY (Food_id, Ingredient)
 );
 
--- Table for MEA
-CREATE TABLE MEA (
+-- Table for MEAT
+CREATE TABLE MEAT (
     Food_id INT,
     Meat_type VARCHAR(50),
     FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id),

@@ -4,10 +4,10 @@ def dbConnection():
     try:
         connection = mariaDB.connect(
             user='root',
-            password='iamnicoantonio1124',
+            password='admin',
             host='localhost',  
             port=3306,         
-            database='reviewsystemdb'  
+            database='FoodReviewDB'  
         )
         return connection
     except mariaDB.Error as e:
@@ -27,8 +27,7 @@ def signUp(f_name, m_name, l_name, birthday, email, password):
         
         query = """
         INSERT INTO CUSTOMER (First_name, Middle_name, Last_name, Birthday, Age, Email, Password)
-        VALUES (%s, %s, %s, STR_TO_DATE(%s, '%%m/%%d/%%Y'), 
-        FLOOR(DATEDIFF(CURDATE(), STR_TO_DATE(%s, '%%m/%%d/%%Y')) / 365.25), %s, %s)
+        VALUES (%s, %s, %s, %s, FLOOR(DATEDIFF(CURDATE(), %s) / 365.25), %s, %s)
         """
         
         cursor.execute(query, (f_name, m_name, l_name, birthday, birthday, email, password))

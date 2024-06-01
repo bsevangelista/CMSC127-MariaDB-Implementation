@@ -11,7 +11,7 @@ def is_valid_email(email):
 
 def is_valid_date(date_string):
     try:
-        datetime.strptime(date_string, '%m/%d/%Y')
+        datetime.strptime(date_string, '%Y/%m/%d')
         return True
     except ValueError:
         return False
@@ -94,9 +94,9 @@ def signUp():
         break
     
     while True:
-        birthday = input('Birthday(mm/dd/yyyy): ').strip()
+        birthday = input('Birthday(yyyy/mm/dd): ').strip()
         if not is_valid_date(birthday):
-            print("Invalid birthday format. Please use mm/dd/yyyy.")
+            print("Invalid birthday format. Please use yyyy/mm/dd")
             continue
         break
     
