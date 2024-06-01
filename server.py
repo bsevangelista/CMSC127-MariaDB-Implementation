@@ -1,36 +1,34 @@
 import mysql.connector as mariaDB
 
-# configure before using to other devices
 def dbConnection():
     try:
         connection = mariaDB.connect(
             user='root',
-            password='admin',
+            password='iamnicoantonio1124',
             host='localhost',  
             port=3306,         
-            database='test'  
+            database='reviewsystemdb'  
         )
         return connection
     except mariaDB.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
         return None
 
-######################################## INSERT FUNCTIONS #################################################
 def signUp(f_name, m_name, l_name, birthday, email, password):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
         return
     if checkEmailExists(email):
-        print("Email already existing!")
+        print("Email already exists!")
         return
     try:
         cursor = connection.cursor()
         
         query = """
-        INSERT INTO customer (first_name, middle_name, last_name, birthday, age, email, password)
-        VALUES (%s, %s, %s, STR_TO_DATE(%s, '%m/%d/%Y'), 
-        FLOOR(DATEDIFF(CURDATE(), STR_TO_DATE(%s, '%m/%d/%Y')) / 365.25), %s, %s)
+        INSERT INTO CUSTOMER (First_name, Middle_name, Last_name, Birthday, Age, Email, Password)
+        VALUES (%s, %s, %s, STR_TO_DATE(%s, '%%m/%%d/%%Y'), 
+        FLOOR(DATEDIFF(CURDATE(), STR_TO_DATE(%s, '%%m/%%d/%%Y')) / 365.25), %s, %s)
         """
         
         cursor.execute(query, (f_name, m_name, l_name, birthday, birthday, email, password))
@@ -44,37 +42,83 @@ def signUp(f_name, m_name, l_name, birthday, email, password):
         cursor.close()
         connection.close()
 
-######################################## SELECT FUNCTIONS #################################################
 def user_signIn(email, password):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
-        return
+        return 'db_error'
     
     try:
         cursor = connection.cursor()
         
-        query = """
-        SELECT email FROM customer WHERE email = %s AND password = %s
+        # Check if email exists
+        email_query = """
+        SELECT Email FROM CUSTOMER WHERE Email = %s
         """
+        cursor.execute(email_query, (email,))
+        email_rows = cursor.fetchall()
         
+        if not email_rows:
+            return 'email_not_found'
+        
+        # Check if password is correct
+        query = """
+        SELECT Email FROM CUSTOMER WHERE Email = %s AND Password = %s
+        """
         cursor.execute(query, (email, password))
         rows = cursor.fetchall()
         
         if rows:
-            print("Signin successful!")
-            return True  # Sign-in successful
+            return 'success'  # Sign-in successful
         else:
-            print("Invalid email or password.")
-            return False  # Sign-in failed
+            return 'incorrect_password'  # Password incorrect
     
     except mariaDB.Error as e:
         print(f"Error: {e}")
+        return 'db_error'
     
     finally:
         cursor.close()
         connection.close()
+
+def admin_signIn(email, password):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return 'db_error'
+    
+    try:
+        cursor = connection.cursor()
         
+        # Check if email exists
+        email_query = """
+        SELECT Email FROM ADMIN WHERE Email = %s
+        """
+        cursor.execute(email_query, (email,))
+        email_rows = cursor.fetchall()
+        
+        if not email_rows:
+            return 'email_not_found'
+        
+        # Check if password is correct
+        query = """
+        SELECT Email FROM ADMIN WHERE Email = %s AND Password = %s
+        """
+        cursor.execute(query, (email, password))
+        rows = cursor.fetchall()
+        
+        if rows:
+            return 'success'  # Sign-in successful
+        else:
+            return 'incorrect_password'  # Password incorrect
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return 'db_error'
+    
+    finally:
+        cursor.close()
+        connection.close()
 
 def checkEmailExists(email):
     connection = dbConnection()
@@ -86,12 +130,12 @@ def checkEmailExists(email):
         cursor = connection.cursor()
         
         query = """
-        SELECT email FROM customer WHERE email = %s
+        SELECT Email FROM CUSTOMER WHERE Email = %s
         """
         
         cursor.execute(query, (email,))
         rows = cursor.fetchall()
-        # print(rows)
+        
         if rows:
             return True  # Email exists in the database
         else:
@@ -104,7 +148,3 @@ def checkEmailExists(email):
     finally:
         cursor.close()
         connection.close()
-        
-
-# print(dbConnection())
-# signUp('John', 'M', 'Doe', '01/01/1990', 'john.doe@example.com', 'password123')

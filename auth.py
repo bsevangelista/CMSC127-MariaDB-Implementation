@@ -30,9 +30,17 @@ def user_signIn():
             continue
         break
     
-    if server.signIn(email, password):
+    result = server.user_signIn(email, password)
+    
+    if result == 'success':
+        print("Sign In successful!")
         review.home()
-        return
+    elif result == 'email_not_found':
+        print("Email not found. Please sign up.")
+    elif result == 'incorrect_password':
+        print("Incorrect password. Please try again.")
+    else:
+        print("An error occurred during sign in.")
     return
 
 def admin_signIn():
@@ -50,9 +58,17 @@ def admin_signIn():
             continue
         break
     
-    if server.admin_signIn(email, password):
-        # .admin_dashboard()
-        return
+    result = server.admin_signIn(email, password)
+    
+    if result == 'success':
+        print("Admin Sign In successful!")
+        # admin.dashboard()
+    elif result == 'email_not_found':
+        print("Admin email not found.")
+    elif result == 'incorrect_password':
+        print("Incorrect password. Please try again.")
+    else:
+        print("An error occurred during admin sign in.")
     return
 
 def signUp():
@@ -100,7 +116,6 @@ def signUp():
     server.signUp(first_name, middle_name, last_name, birthday, email, password)
     return
 
-## start loop
 def start():
     while True:
         print("------------------Welcome-----------------")
@@ -109,16 +124,16 @@ def start():
         print("[3] Sign Up")
         print("[0] Exit")
         
-        choice = int(input("Select an option: "))
+        choice = input("Select an option: ").strip()
         
-        if choice == 0:
+        if choice == "0":
             print("Goodbye!")
             break
-        elif choice == 1:
+        elif choice == "1":
             user_signIn()
-        elif choice == 2:
+        elif choice == "2":
             admin_signIn()
-        elif choice == 3:
+        elif choice == "3":
             signUp()
         else:
             print("Invalid option. Please try again.")
