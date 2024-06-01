@@ -148,3 +148,135 @@ def checkEmailExists(email):
     finally:
         cursor.close()
         connection.close()
+
+
+
+########## ADMIN FUNCTIONS ##########
+
+
+
+
+########## FUNCTIONS FOR ADDING A FOOD ESTABLISHMENT ##########
+
+# Function for adding a food establishment
+def addFoodEstablishment(estab_name,
+                         baranggay,
+                         postal_code,
+                         street,
+                         city,
+                         province,
+                         rating, 
+                         average_price, 
+                         food_type_served):
+    
+    connection = dbConnection()
+
+    if connection is None:
+        print("Failed to connect to database")
+        return
+    
+    try:
+        cursor = connection.cursor()
+
+        query = """
+        INSERT INTO FOOD_ESTABLISHMENT (Estab_name, Baranggay, Postal_code, Street, City, Province, Rating, Average_price, Food_type_served)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query,(estab_name,
+                                baranggay,
+                                postal_code,
+                                street,
+                                city,
+                                province,
+                                rating, 
+                                average_price, 
+                                food_type_served))
+        
+        connection.commit()
+        print("Food Establishment added successfully!")
+
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+# Function for updating food establishment
+def updateFoodEstablishment(establishment_id, estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        UPDATE FOOD_ESTABLISHMENT
+        SET Estab_name = %s, Baranggay = %s, Postal_code = %s, Street = %s, City = %s, Province = %s, Rating = %s, Average_price = %s, Food_type_served = %s
+        WHERE Establishment_id = %s
+        """
+        
+        cursor.execute(query, (estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served, establishment_id))
+        connection.commit()
+        print("Food Establishment updated successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def deleteFoodEstablishment(establishment_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = "DELETE FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s"
+        
+        cursor.execute(query, (establishment_id,))
+        connection.commit()
+        print("Food Establishment deleted successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def searchFoodEstablishment(search_term):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT * FROM FOOD_ESTABLISHMENT
+        WHERE Estab_name LIKE %s OR City LIKE %s OR Province LIKE %s
+        """
+        
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term, like_term, like_term))
+        results = cursor.fetchall()
+        
+        return results
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return []
+    
+    finally:
+        cursor.close()
+        connection.close()
+

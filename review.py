@@ -1,3 +1,27 @@
+import server
+
+def get_customer_id(email):
+    return server.getCustomerIdByEmail(email)
+
+# function for adding review
+def add_review():
+
+    try:
+
+        email = input("Enter your email: ").strip()
+        customer_id = get_customer_id(email)
+
+        if not customer_id:
+            print("Customer not found. Try again!")
+            return
+               
+
+    
+    except Exception as e:
+        print(e)
+
+
+
 def home():
     while True:
         print("------------------Review------------------")
