@@ -45,7 +45,7 @@ def signUp(f_name, m_name, l_name, birthday, email, password):
         connection.close()
 
 ######################################## SELECT FUNCTIONS #################################################
-def signIn(email, password):
+def user_signIn(email, password):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")

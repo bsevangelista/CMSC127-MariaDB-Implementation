@@ -1,31 +1,7 @@
 import server
 import re
 import review
-import food_establishment
-import food_item
 from datetime import datetime
-
-def home():
-    while True:
-        print("---------------Review System--------------")
-        print("[1] Review")
-        print("[2] Food Establishment")
-        print("[3] Food Item")
-        print("[0] Sign Out")
-        
-        choice = int(input("Select an option: "))
-        
-        if choice == 0:
-            print("Signed Out!")
-            break
-        elif choice == 1:
-            review.home()
-        elif choice == 2:
-            food_establishment.home()
-        elif choice == 3:
-            food_item.home()
-        else:
-            print("Invalid option. Please try again.")
 
 def is_valid_email(email):
     # regex for validating an email address
@@ -39,7 +15,7 @@ def is_valid_date(date_string):
     except ValueError:
         return False
 
-def signIn():
+def user_signIn():
     while True:
         email = input('Email: ').strip()
         if not is_valid_email(email):
@@ -55,7 +31,27 @@ def signIn():
         break
     
     if server.signIn(email, password):
-        home()
+        review.home()
+        return
+    return
+
+def admin_signIn():
+    while True:
+        email = input('Email: ').strip()
+        if not is_valid_email(email):
+            print("Invalid email format.")
+            continue
+        break
+    
+    while True:
+        password = input('Password: ').strip()
+        if not len(password) >= 8:
+            print("Password must be at least 8 characters long.")
+            continue
+        break
+    
+    if server.admin_signIn(email, password):
+        # .admin_dashboard()
         return
     return
 
@@ -108,8 +104,9 @@ def signUp():
 def start():
     while True:
         print("------------------Welcome-----------------")
-        print("[1] Sign In")
-        print("[2] Sign Up")
+        print("[1] User Sign In")
+        print("[2] Admin Sign In")
+        print("[3] Sign Up")
         print("[0] Exit")
         
         choice = int(input("Select an option: "))
@@ -118,8 +115,10 @@ def start():
             print("Goodbye!")
             break
         elif choice == 1:
-            signIn()
+            user_signIn()
         elif choice == 2:
+            admin_signIn()
+        elif choice == 3:
             signUp()
         else:
             print("Invalid option. Please try again.")
