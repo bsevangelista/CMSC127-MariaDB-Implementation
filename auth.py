@@ -1,4 +1,5 @@
 import server
+import admin
 import re
 import review
 from datetime import datetime
@@ -62,7 +63,7 @@ def admin_signIn():
     
     if result == 'success':
         print("Admin Sign In successful!")
-        # admin.dashboard()
+        admin.home()
     elif result == 'email_not_found':
         print("Admin email not found.")
     elif result == 'incorrect_password':
