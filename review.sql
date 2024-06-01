@@ -22,10 +22,11 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     Street VARCHAR(100),
     City VARCHAR(50),
     Province VARCHAR(50),
-    Rating FLOAT, -- This will be computed based on FOOD_REVIEW ratings
-    Average_price FLOAT, -- This will be computed based on FOOD_ITEM prices
+    Rating FLOAT DEFAULT 0, -- Initial value set to 0
+    Average_price FLOAT DEFAULT 0, -- Initial value set to 0
     food_type_served VARCHAR(100)
 );
+
 
 -- Table for FOOD_ITEM
 CREATE TABLE FOOD_ITEM (
