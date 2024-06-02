@@ -53,7 +53,7 @@ CREATE TABLE FOOD_REVIEW (
     review_date DATE NOT NULL,
     review_time TIME NOT NULL,
     type_of_review VARCHAR(50) NOT NULL,
-    rating DECIMAL(2,1) NOT NULL,
+    rating DECIMAL(2,1) NOT NULL DEFAULT 0,
     title VARCHAR(255) NOT NULL,
     suggestion TEXT NOT NULL,
     customer_id INT,
@@ -128,8 +128,8 @@ CREATE TRIGGER update_average_rating
 AFTER INSERT ON FOOD_REVIEW
 FOR EACH ROW
 BEGIN
+    DECLARE avg_rating DECIMAL(2,1);
     IF NEW.establishment_id IS NOT NULL AND NEW.food_id IS NULL THEN
-        DECLARE avg_rating DECIMAL(2,1);
         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = NEW.establishment_id;
         UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = NEW.establishment_id;
     END IF;
@@ -169,8 +169,8 @@ CREATE TRIGGER update_food_item_rating
 AFTER INSERT ON FOOD_REVIEW
 FOR EACH ROW
 BEGIN
+    DECLARE avg_rating DECIMAL(2,1);
     IF NEW.food_id IS NOT NULL THEN
-        DECLARE avg_rating DECIMAL(2,1);
         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE food_id = NEW.food_id;
         UPDATE FOOD_ITEM SET rating = avg_rating WHERE food_id = NEW.food_id;
     END IF;
