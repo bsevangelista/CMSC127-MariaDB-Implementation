@@ -40,7 +40,7 @@ CREATE TABLE FOOD_ESTABLISHMENT (
 CREATE TABLE FOOD_ITEM (
     food_id INT AUTO_INCREMENT PRIMARY KEY,
     price DECIMAL(6,2) NOT NULL,
-    rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
+    rating DECIMAL(2,1) NOT NULL DEFAULT 0, -- Initial value set to 0
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     establishment_id INT,
@@ -96,84 +96,128 @@ CREATE TABLE DESSERT (
     PRIMARY KEY (food_id, dessert_type)
 );
 
--- Trigger to update the average price in FOOD_ESTABLISHMENT when a FOOD_ITEM is inserted
-DELIMITER //
-CREATE TRIGGER update_average_price
-AFTER INSERT ON FOOD_ITEM
-FOR EACH ROW
-BEGIN
-    DECLARE avg_price DECIMAL(6,2);
-    SELECT AVG(price) INTO avg_price FROM FOOD_ITEM WHERE establishment_id = NEW.establishment_id;
-    UPDATE FOOD_ESTABLISHMENT SET average_price = avg_price WHERE establishment_id = NEW.establishment_id;
-END;
-//
-DELIMITER ;
+-- -- Trigger to update the average price in FOOD_ESTABLISHMENT when a FOOD_ITEM is inserted
+-- DELIMITER //
+-- CREATE TRIGGER ESTABLISHMENT_update_average_price
+-- AFTER INSERT ON FOOD_ITEM
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_price DECIMAL(6,2);
+--     SELECT AVG(price) INTO avg_price FROM FOOD_ITEM WHERE establishment_id = NEW.establishment_id;
+--     UPDATE FOOD_ESTABLISHMENT SET average_price = avg_price WHERE establishment_id = NEW.establishment_id;
+-- END;
+-- //
+-- DELIMITER ;
 
--- Trigger to update the average price in FOOD_ESTABLISHMENT when a FOOD_ITEM is updated
-DELIMITER //
-CREATE TRIGGER update_average_price_on_update
-AFTER UPDATE ON FOOD_ITEM
-FOR EACH ROW
-BEGIN
-    DECLARE avg_price DECIMAL(6,2);
-    SELECT AVG(price) INTO avg_price FROM FOOD_ITEM WHERE establishment_id = OLD.establishment_id;
-    UPDATE FOOD_ESTABLISHMENT SET average_price = avg_price WHERE establishment_id = OLD.establishment_id;
-END;
-//
-DELIMITER ;
+-- -- Trigger to update the average price in FOOD_ESTABLISHMENT when a FOOD_ITEM is updated
+-- DELIMITER //
+-- CREATE TRIGGER ESTABLISHMENT_update_average_price_on_update
+-- AFTER UPDATE ON FOOD_ITEM
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_price DECIMAL(6,2);
+--     SELECT AVG(price) INTO avg_price FROM FOOD_ITEM WHERE establishment_id = OLD.establishment_id;
+--     UPDATE FOOD_ESTABLISHMENT SET average_price = avg_price WHERE establishment_id = OLD.establishment_id;
+-- END;
+-- //
+-- DELIMITER ;
 
--- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is inserted
-DELIMITER //
-CREATE TRIGGER update_average_rating
-AFTER INSERT ON FOOD_REVIEW
-FOR EACH ROW
-BEGIN
-    DECLARE avg_rating DECIMAL(2,1);
-    IF NEW.establishment_id IS NOT NULL AND NEW.food_id IS NULL THEN
-        SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = NEW.establishment_id;
-        UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = NEW.establishment_id;
-    END IF;
-END;
-//
-DELIMITER ;
+-- -- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is inserted
+-- DELIMITER //
+-- CREATE TRIGGER ESTABLISHMENT_update_average_rating
+-- AFTER INSERT ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+--     IF NEW.establishment_id IS NOT NULL AND NEW.food_id IS NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = NEW.establishment_id;
+--         UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = NEW.establishment_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;
 
--- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is updated
-DELIMITER //
-CREATE TRIGGER update_average_rating_on_update
-AFTER UPDATE ON FOOD_REVIEW
-FOR EACH ROW
-BEGIN
-    DECLARE avg_rating DECIMAL(2,1);
-    SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = OLD.establishment_id;
-    UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = OLD.establishment_id;
-END;
-//
-DELIMITER ;
+-- -- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is updated
+-- DELIMITER //
+-- CREATE TRIGGER ESTABLISHMENT_update_average_rating_on_update
+-- AFTER UPDATE ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+--     IF OLD.establishment_id IS NOT NULL AND OLD.food_id IS NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = OLD.establishment_id;
+--         UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = OLD.establishment_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;
 
--- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is deleted
-DELIMITER //
-CREATE TRIGGER update_average_rating_on_delete
-AFTER DELETE ON FOOD_REVIEW
-FOR EACH ROW
-BEGIN
-    DECLARE avg_rating DECIMAL(2,1);
-    SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = OLD.establishment_id;
-    UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = OLD.establishment_id;
-END;
-//
-DELIMITER ;
+-- -- Trigger to update the average rating in FOOD_ESTABLISHMENT when a FOOD_REVIEW is deleted
+-- DELIMITER //
+-- CREATE TRIGGER ESTABLISHMENT_update_average_rating_on_delete
+-- AFTER DELETE ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+--     IF OLD.establishment_id IS NOT NULL AND OLD.food_id IS NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE establishment_id = OLD.establishment_id;
 
--- Trigger to update the average rating in FOOD_ITEM when a FOOD_REVIEW is inserted
-DELIMITER //
-CREATE TRIGGER update_food_item_rating
-AFTER INSERT ON FOOD_REVIEW
-FOR EACH ROW
-BEGIN
-    DECLARE avg_rating DECIMAL(2,1);
-    IF NEW.food_id IS NOT NULL THEN
-        SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE food_id = NEW.food_id;
-        UPDATE FOOD_ITEM SET rating = avg_rating WHERE food_id = NEW.food_id;
-    END IF;
-END;
-//
-DELIMITER ;
+--         IF avg_rating IS NULL THEN
+--             SET avg_rating = 0.0; -- Set a default value if there are no reviews
+--         END IF;
+
+--         UPDATE FOOD_ESTABLISHMENT SET rating = avg_rating WHERE establishment_id = OLD.establishment_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;
+
+-- -- Trigger to update the average rating in FOOD_ITEM when a FOOD_REVIEW is inserted
+-- DELIMITER //
+-- CREATE TRIGGER ITEM_update_food_item_rating
+-- AFTER INSERT ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+--     IF NEW.food_id IS NOT NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE food_id = NEW.food_id;
+--         UPDATE FOOD_ITEM SET rating = avg_rating WHERE food_id = NEW.food_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;
+
+-- -- Trigger to update the average rating in FOOD_ITEM when a FOOD_REVIEW is updated
+-- DELIMITER //
+-- CREATE TRIGGER ITEM_update_food_item_rating_on_update
+-- AFTER UPDATE ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+--     IF OLD.food_id IS NOT NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE food_id = OLD.food_id;
+--         UPDATE FOOD_ITEM SET rating = avg_rating WHERE food_id = OLD.food_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;
+
+-- DELIMITER //
+-- CREATE TRIGGER ITEM_update_food_item_rating_on_delete
+-- AFTER DELETE ON FOOD_REVIEW
+-- FOR EACH ROW
+-- BEGIN
+--     DECLARE avg_rating DECIMAL(2,1);
+    
+--     IF OLD.food_id IS NOT NULL THEN
+--         SELECT AVG(rating) INTO avg_rating FROM FOOD_REVIEW WHERE food_id = OLD.food_id;
+        
+--         IF avg_rating IS NULL THEN
+--             SET avg_rating = 0.0; -- Set a default value if there are no reviews
+--         END IF;
+        
+--         UPDATE FOOD_ITEM SET rating = avg_rating WHERE food_id = OLD.food_id;
+--     END IF;
+-- END;
+-- //
+-- DELIMITER ;

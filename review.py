@@ -15,6 +15,12 @@ def get_all_establishment():
 def get_establishment_items(establishment_id):
     return server.getFoodItemsByEstabId(establishment_id)
 
+def get_all_user_review(customer_id):
+    return server.getReviewsByCustomerId(customer_id)
+
+def get_review(review_id):
+    return server.getReviewByReviewId(review_id)
+
 # function for adding review
 def add_food_establishment_review(customer_id):
     try:
@@ -26,10 +32,10 @@ def add_food_establishment_review(customer_id):
             print("No food establishments found.")
             return
         else:
-            print("Food Establishment Names:")
+            print("\n----------Food Establishment Names--------")
             for name in establishment_names:
                 print(name)
-            print()
+            print("----------Food Establishment Names--------\n")
         
         review_type = 'Food Establishment'
 
@@ -89,12 +95,12 @@ def add_food_item_review(customer_id):
             print("No food establishments found.")
             return
         else:
-            print("Food Establishment Names:")
+            print("\n----------Food Establishment Names--------")
             for name in establishment_names:
                 print(name)
-            print()
+            print("----------Food Establishment Names--------\n")
         
-        review_type = 'Food Establishment'
+        review_type = 'Food Item'
 
         while True:
             establishment_name = str(input("Enter Establishment Name: "))
@@ -116,10 +122,10 @@ def add_food_item_review(customer_id):
             print("No food food items found.")
             return
         else:
-            print("Food Item Names:")
+            print(f"\n-----Food Item/s in {establishment_name}-----")
             for name in food_names:
                 print(name)
-            print()
+            print(f"-----Food Item/s in {establishment_name}-----\n")
         
         while True:
             item_name = str(input("Enter Item Name To Review: "))
@@ -127,7 +133,6 @@ def add_food_item_review(customer_id):
                 print("Item Name Required!")
                 continue
             item_id = get_item_id(item_name, establishment_id)
-            print(item_id)
             if not item_id:
                 print("Item Not Found!")
                 continue
@@ -167,6 +172,116 @@ def add_food_item_review(customer_id):
     except Exception as e:
         print(e)
 
+def update_review(customer_id):
+    try:
+        reviews = get_all_user_review(customer_id)
+        if reviews is False:
+            print("Failed to retrieve reviews.")
+            return
+        elif reviews is None:
+            print("No review found.")
+            return
+        else:
+            print("\n------------------Reviews-----------------")
+            print()
+            for review in reviews:
+                review_id, title, suggestion, rating, item_name, establishment_name = review
+                print(f"Review ID: \t\t{review_id}")
+                if not item_name:
+                    print(f"Review Subject: \t{establishment_name}")
+                else:
+                    print(f"Review Subject: \t{item_name} of {establishment_name}")
+                print(f"Review title: \t\t{title}")
+                print(f"Review suggestion: \t{suggestion}")
+                print(f"Review rating: \t\t{rating}")
+                print()
+            print("------------------Reviews-----------------\n")
+        
+        while True:
+            review_id = str(input("Enter Review ID to Update: "))
+            if not review_id:
+                print("Review ID Required!")
+                continue
+            review = get_review(review_id)
+            if not review:
+                print("Review Not Found!")
+                continue
+            break
+        
+        while True:
+            title = str(input("Update Review Title: "))
+            if not title:
+                print("Review Title Required!")
+                continue
+            break
+        
+        while True:
+            suggestion = str(input("Update Suggestion: "))
+            if not suggestion:
+                print("Suggestion Required!")
+                continue
+            break
+        
+        while True:
+            rating_input = input("Update Rating: ")
+            if not rating_input:
+                print("Rating Required!")
+                continue
+            try:
+                rating = int(rating_input)
+                if not 0 <= rating <= 5:
+                    print("Rating must be between 0 and 5.")
+                    continue
+            except ValueError:
+                print("Invalid Input! Please enter a valid number.")
+                continue
+            break
+        
+        server.updateReview(review_id, title, suggestion, rating)
+        return
+    except Exception as e:
+        print(e)
+
+def delete_review(customer_id):
+    try:
+        reviews = get_all_user_review(customer_id)
+        if reviews is False:
+            print("Failed to retrieve reviews.")
+            return
+        elif reviews is None:
+            print("No review found.")
+            return
+        else:
+            print("\n------------------Reviews-----------------")
+            print()
+            for review in reviews:
+                review_id, title, suggestion, rating, item_name, establishment_name = review
+                print(f"Review ID: \t\t{review_id}")
+                if not item_name:
+                    print(f"Review Subject: \t{establishment_name}")
+                else:
+                    print(f"Review Subject: \t{item_name} of {establishment_name}")
+                print(f"Review title: \t\t{title}")
+                print(f"Review suggestion: \t{suggestion}")
+                print(f"Review rating: \t\t{rating}")
+                print()
+            print("------------------Reviews-----------------\n")
+        
+        while True:
+            review_id = str(input("Enter Review ID to Delete: "))
+            if not review_id:
+                print("Review ID Required!")
+                continue
+            review = get_review(review_id)
+            if not review:
+                print("Review Not Found!")
+                continue
+            break
+            
+        server.deleteReview(review_id)
+        return
+    except Exception as e:
+        print(e)
 
 def home(customer_id):
     while True:
@@ -186,13 +301,11 @@ def home(customer_id):
         elif choice == '2':
             add_food_item_review(customer_id)
         elif choice == '3':
-            print("Delete Review selected.")
-            # Add code to handle deleting a review here
+            update_review(customer_id)
         elif choice == '4':
-            print("Delete Review selected.")
-            # Add code to handle deleting a review here
+            delete_review(customer_id)
         else:
             print("Invalid option. Please try again.")
         
 # for testing only
-add_food_item_review(6)
+# home(6)
