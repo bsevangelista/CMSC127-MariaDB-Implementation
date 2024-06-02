@@ -4,10 +4,10 @@ def dbConnection():
     try:
         connection = mariaDB.connect(
             user='root',
-            password='iamnicoantonio1124',
+            password='admin',
             host='localhost',  
             port=3306,         
-            database='reviewsystemdb'  
+            database='FoodReviewDB'  
         )
         return connection
     except mariaDB.Error as e:
@@ -26,9 +26,8 @@ def signUp(f_name, m_name, l_name, birthday, email, password):
         cursor = connection.cursor()
         
         query = """
-        INSERT INTO CUSTOMER (First_name, Middle_name, Last_name, Birthday, Age, Email, Password)
-        VALUES (%s, %s, %s, STR_TO_DATE(%s, '%%m/%%d/%%Y'), 
-        FLOOR(DATEDIFF(CURDATE(), STR_TO_DATE(%s, '%%m/%%d/%%Y')) / 365.25), %s, %s)
+        INSERT INTO CUSTOMER (first_name, middle_name, last_name, birthday, age, email, password)
+        VALUES (%s, %s, %s, %s, FLOOR(DATEDIFF(CURDATE(), %s) / 365.25), %s, %s)
         """
         
         cursor.execute(query, (f_name, m_name, l_name, birthday, birthday, email, password))
@@ -53,7 +52,7 @@ def user_signIn(email, password):
         
         # Check if email exists
         email_query = """
-        SELECT Email FROM CUSTOMER WHERE Email = %s
+        SELECT email FROM CUSTOMER WHERE email = %s
         """
         cursor.execute(email_query, (email,))
         email_rows = cursor.fetchall()
@@ -63,7 +62,7 @@ def user_signIn(email, password):
         
         # Check if password is correct
         query = """
-        SELECT Email FROM CUSTOMER WHERE Email = %s AND Password = %s
+        SELECT email FROM CUSTOMER WHERE email = %s AND password = %s
         """
         cursor.execute(query, (email, password))
         rows = cursor.fetchall()
@@ -92,7 +91,7 @@ def admin_signIn(email, password):
         
         # Check if email exists
         email_query = """
-        SELECT Email FROM ADMIN WHERE Email = %s
+        SELECT email FROM ADMIN WHERE email = %s
         """
         cursor.execute(email_query, (email,))
         email_rows = cursor.fetchall()
@@ -102,7 +101,7 @@ def admin_signIn(email, password):
         
         # Check if password is correct
         query = """
-        SELECT Email FROM ADMIN WHERE Email = %s AND Password = %s
+        SELECT email FROM ADMIN WHERE email = %s AND password = %s
         """
         cursor.execute(query, (email, password))
         rows = cursor.fetchall()
@@ -130,7 +129,7 @@ def checkEmailExists(email):
         cursor = connection.cursor()
         
         query = """
-        SELECT Email FROM CUSTOMER WHERE Email = %s
+        SELECT email FROM CUSTOMER WHERE email = %s
         """
         
         cursor.execute(query, (email,))
@@ -298,13 +297,13 @@ def updateAveragePrice(establishment_id, cursor):
 def updateAverageRating(establishment_id, cursor):
     try:
         query = """
-        SELECT AVG(Rating) FROM FOOD_REVIEW WHERE Establishment_id = %s
+        SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s
         """
         cursor.execute(query, (establishment_id,))
         average_rating = cursor.fetchone()[0] or 0
         
         update_query = """
-        UPDATE FOOD_ESTABLISHMENT SET Rating = %s WHERE Establishment_id = %s
+        UPDATE FOOD_ESTABLISHMENT SET rating = %s WHERE establishment_id = %s
         """
         cursor.execute(update_query, (average_rating, establishment_id))
     except mariaDB.Error as e:
@@ -486,6 +485,338 @@ def searchFoodItem(search_term):
     except mariaDB.Error as e:
         print(f"Error: {e}")
         return []
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+
+#########################################################################################################
+#                                                                                                       #
+#                               FOOD REVIEW FUNCTIONS                                                   #
+#                                                                                                       #
+#########################################################################################################
+def getFoodEstablishmentName():
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT name FROM FOOD_ESTABLISHMENT
+        """
+        
+        cursor.execute(query)
+        results = cursor.fetchall()
+        
+        if results:
+            return [row[0] for row in results]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def getFoodItemsByEstabId(establishment_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT name FROM FOOD_ITEM WHERE establishment_id = %s
+        """
+        
+        cursor.execute(query, (establishment_id,))
+        results = cursor.fetchall()
+        
+        if results:
+            return [row[0] for row in results]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+
+def getCustomerIdByEmail(email):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT customer_id FROM CUSTOMER WHERE email = %s
+        """
+        
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            return result[0]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+def getEstablishmentIdByName(establishmment_name):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT establishment_id FROM FOOD_ESTABLISHMENT WHERE name = %s
+        """
+        
+        cursor.execute(query, (establishmment_name,))
+        result = cursor.fetchone()
+        
+        if result:
+            return result[0]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+def getItemIdByName(item_name, establishment_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT food_id FROM FOOD_ITEM WHERE name = %s AND establishment_id = %s
+        """
+        
+        cursor.execute(query, (item_name, establishment_id))
+        result = cursor.fetchone()
+        
+        if result:
+            return result[0]  # Extract names from the results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+
+def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, establishment_id):
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return
+        
+        try:
+            cursor = connection.cursor()
+            
+            query = """
+            INSERT INTO FOOD_REVIEW (review_date, review_time, Type_of_review, rating, title, suggestion, customer_id, establishment_id)
+            VALUES (CURDATE(), CURTIME(), %s, %s, %s, %s, %s, %s)
+            """
+            
+            cursor.execute(query, (type, rating, title, suggestion, customer_id, establishment_id))
+            connection.commit()
+            print("Review Added successfully!")
+        
+        except mariaDB.Error as e:
+            print(f"Error: {e}")
+        
+        finally:
+            cursor.close()
+            connection.close()
+            
+def addFoodItemReview(type, title, suggestion, rating, customer_id, establishment_id, item_id):
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return
+        
+        try:
+            cursor = connection.cursor()
+            
+            query = """
+            INSERT INTO FOOD_REVIEW (review_date, review_time, Type_of_review, rating, title, suggestion, customer_id, establishment_id, food_id)
+            VALUES (CURDATE(), CURTIME(), %s, %s, %s, %s, %s, %s, %s)
+            """
+            
+            cursor.execute(query, (type, rating, title, suggestion, customer_id, establishment_id, item_id))
+            connection.commit()
+            print("Review Added successfully!")
+        
+        except mariaDB.Error as e:
+            print(f"Error: {e}")
+        
+        finally:
+            cursor.close()
+            connection.close()
+            
+def getReviewsByCustomerId(customer_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT 
+            r.review_id,
+            r.title,
+            r.suggestion,
+            r.rating,
+            fi.name as item_name,
+            fe.name as establishment_name
+        FROM 
+            FOOD_REVIEW r
+        JOIN 
+            CUSTOMER c ON r.customer_id = c.customer_id
+        LEFT JOIN 
+            FOOD_ITEM fi ON r.food_id = fi.food_id
+        LEFT JOIN 
+            FOOD_ESTABLISHMENT fe ON r.establishment_id = fe.establishment_id
+        WHERE 
+            r.customer_id = %s
+        """
+        
+        cursor.execute(query, (customer_id,))
+        results = cursor.fetchall()
+        
+        if results:
+            return results
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+def getReviewByReviewId(review_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT * FROM FOOD_REVIEW WHERE review_id = %s
+        """
+        
+        cursor.execute(query, (review_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            return result  
+        else:
+            return None 
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+        
+def updateReview(review_id, title, suggestion, rating):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        UPDATE FOOD_REVIEW 
+        SET title = %s, suggestion = %s, rating = %s 
+        WHERE review_id = %s
+        """
+        
+        cursor.execute(query, (title, suggestion, rating, review_id))
+        connection.commit()
+        print("Review updated successfully.")
+        return True
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def deleteReview(review_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        DELETE FROM FOOD_REVIEW 
+        WHERE review_id = %s
+        """
+        
+        cursor.execute(query, (review_id,))
+        connection.commit()
+        print("Review deleted successfully.")
+        return True
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
     
     finally:
         cursor.close()

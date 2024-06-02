@@ -4,6 +4,9 @@ import re
 import review
 from datetime import datetime
 
+def get_customer_id(email):
+    return server.getCustomerIdByEmail(email)
+
 def is_valid_email(email):
     # regex for validating an email address
     email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -11,7 +14,7 @@ def is_valid_email(email):
 
 def is_valid_date(date_string):
     try:
-        datetime.strptime(date_string, '%m/%d/%Y')
+        datetime.strptime(date_string, '%Y/%m/%d')
         return True
     except ValueError:
         return False
@@ -32,10 +35,11 @@ def user_signIn():
         break
     
     result = server.user_signIn(email, password)
+    customer_id = get_customer_id(email)
     
     if result == 'success':
         print("Sign In successful!")
-        review.home()
+        review.home(customer_id)
     elif result == 'email_not_found':
         print("Email not found. Please sign up.")
     elif result == 'incorrect_password':
@@ -88,9 +92,9 @@ def signUp():
         break
     
     while True:
-        birthday = input('Birthday(mm/dd/yyyy): ').strip()
+        birthday = input('Birthday(yyyy/mm/dd): ').strip()
         if not is_valid_date(birthday):
-            print("Invalid birthday format. Please use mm/dd/yyyy.")
+            print("Invalid birthday format. Please use yyyy/mm/dd")
             continue
         break
     
