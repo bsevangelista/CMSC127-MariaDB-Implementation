@@ -32,10 +32,10 @@ def add_food_establishment_review(customer_id):
             print("No food establishments found.")
             return
         else:
-            print("Food Establishment Names:")
+            print("\n----------Food Establishment Names--------")
             for name in establishment_names:
                 print(name)
-            print()
+            print("----------Food Establishment Names--------\n")
         
         review_type = 'Food Establishment'
 
@@ -95,10 +95,10 @@ def add_food_item_review(customer_id):
             print("No food establishments found.")
             return
         else:
-            print("Food Establishment Names:")
+            print("\n----------Food Establishment Names--------")
             for name in establishment_names:
                 print(name)
-            print()
+            print("----------Food Establishment Names--------\n")
         
         review_type = 'Food Item'
 
@@ -122,10 +122,10 @@ def add_food_item_review(customer_id):
             print("No food food items found.")
             return
         else:
-            print("Food Item Names:")
+            print(f"\n-----Food Item/s in {establishment_name}-----")
             for name in food_names:
                 print(name)
-            print()
+            print(f"-----Food Item/s in {establishment_name}-----\n")
         
         while True:
             item_name = str(input("Enter Item Name To Review: "))
@@ -182,7 +182,7 @@ def update_review(customer_id):
             print("No review found.")
             return
         else:
-            print("------------------Reviews-----------------")
+            print("\n------------------Reviews-----------------")
             print()
             for review in reviews:
                 review_id, title, suggestion, rating, item_name, establishment_name = review
@@ -195,7 +195,7 @@ def update_review(customer_id):
                 print(f"Review suggestion: \t{suggestion}")
                 print(f"Review rating: \t\t{rating}")
                 print()
-            print("------------------Reviews-----------------")
+            print("------------------Reviews-----------------\n")
         
         while True:
             review_id = str(input("Enter Review ID to Update: "))
@@ -252,7 +252,7 @@ def delete_review(customer_id):
             print("No review found.")
             return
         else:
-            print("------------------Reviews-----------------")
+            print("\n------------------Reviews-----------------")
             print()
             for review in reviews:
                 review_id, title, suggestion, rating, item_name, establishment_name = review
@@ -265,7 +265,7 @@ def delete_review(customer_id):
                 print(f"Review suggestion: \t{suggestion}")
                 print(f"Review rating: \t\t{rating}")
                 print()
-            print("------------------Reviews-----------------")
+            print("------------------Reviews-----------------\n")
         
         while True:
             review_id = str(input("Enter Review ID to Delete: "))
@@ -303,10 +303,9 @@ def home(customer_id):
         elif choice == '3':
             update_review(customer_id)
         elif choice == '4':
-            print("Delete Review selected.")
-            # Add code to handle deleting a review here
+            delete_review(customer_id)
         else:
             print("Invalid option. Please try again.")
         
 # for testing only
-delete_review(6)
+home(6)
