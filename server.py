@@ -150,48 +150,8 @@ def checkEmailExists(email):
         connection.close()
 
 
-
-########## ADMIN FUNCTIONS ##########
-def admin_signIn(email, password):
-    connection = dbConnection()
-    if connection is None:
-        print("Failed to connect to the database.")
-        return False
-    
-    try:
-        cursor = connection.cursor()
-        
-        query = """
-        SELECT email FROM ADMIN WHERE email = %s AND password = %s
-        """
-        
-        cursor.execute(query, (email, password))
-        rows = cursor.fetchall()
-        
-        if rows:
-            print("Admin Sign In successful!")
-            return True  # Sign-in successful
-        else:
-            print("Invalid email or password.")
-            return False  # Sign-in failed
-    
-    except mariaDB.Error as e:
-        print(f"Error: {e}")
-        return False
-    
-    finally:
-        cursor.close()
-        connection.close()
-
-
-
-########## FUNCTIONS FOR ADDING A FOOD ESTABLISHMENT ##########
-
-
 #########################################################################################################
-#                                                                                                       #
 #                               Function for adding a food establishment                                #
-#                                                                                                       #
 #########################################################################################################
 def addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating=0, price_range=0):
     connection = dbConnection()
@@ -229,9 +189,7 @@ def addFoodEstablishment(name, barangay, postal_code, street_name, city, provinc
         connection.close()
 
 #########################################################################################################
-#                                                                                                       #
 #                               Function for updating a food establishment                             #
-#                                                                                                       #
 #########################################################################################################
 def updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served):
     connection = dbConnection()
@@ -267,9 +225,7 @@ def updateFoodEstablishment(establishment_id, name, barangay, postal_code, stree
         connection.close()
 
 #########################################################################################################
-#                                                                                                       #
 #                               Function for deleting a food establishment                              #
-#                                                                                                       #
 #########################################################################################################
 def deleteFoodEstablishment(establishment_id):
     connection = dbConnection()
@@ -294,9 +250,7 @@ def deleteFoodEstablishment(establishment_id):
         connection.close()
 
 #########################################################################################################
-#                                                                                                       #
 #                               Function for searching a food establishment                             #
-#                                                                                                       #
 #########################################################################################################
 def searchFoodEstablishment(search_term):
     connection = dbConnection()
@@ -327,9 +281,7 @@ def searchFoodEstablishment(search_term):
         connection.close()
 
 #########################################################################################################
-#                                                                                                       #
-#               Function for getting the rating amd the average price of an establishment               #
-#                                                                                                       #
+#               Function for getting the rating and the average price of an establishment               #
 #########################################################################################################
 def updateAveragePrice(establishment_id, cursor):   
     try:
@@ -363,9 +315,7 @@ def updateAverageRating(establishment_id, cursor):
 
 
 #########################################################################################################
-#                                                                                                       #
 #                                Function for displaying the establishments                             #
-#                                                                                                       #
 #########################################################################################################
 def get_all_food_establishments():
     connection = dbConnection()
@@ -393,13 +343,34 @@ def get_all_food_establishments():
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                Function for checking if establishment exists                          #
+#########################################################################################################
+def isEstablishmentExists(establishment_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        query = "SELECT COUNT(*) FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s"
+        cursor.execute(query, (establishment_id,))
+        result = cursor.fetchone()
+        
+        return result[0] > 0  # Returns True if establishment exists, otherwise False
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    finally:
+        cursor.close()
+        connection.close()
+
 
 #########################################################################################################
-#                                                                                                       #
 #                                   Function for adding the food item                                   #
-#                                                                                                       #
 #########################################################################################################
-def addFoodItem(establishment_id, food_name, price, rating):
+def addFoodItem(establishment_id, name, price, description):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -408,12 +379,16 @@ def addFoodItem(establishment_id, food_name, price, rating):
         cursor = connection.cursor()
         
         query = """
-        INSERT INTO FOOD_ITEM (Establishment_id, Food_name, Price, Rating)
+        INSERT INTO FOOD_ITEM (establishment_id, name, price, description)
         VALUES (%s, %s, %s, %s)
         """
         
-        cursor.execute(query, (establishment_id, food_name, price, rating))
+        cursor.execute(query, (establishment_id, name, price, description))
         connection.commit()
+        
+        # Update the average price after adding a new food item
+        updateAveragePrice(establishment_id, cursor)
+        
         print("Food Item added successfully!")
     
     except mariaDB.Error as e:

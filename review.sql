@@ -27,12 +27,11 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     food_type_served VARCHAR(100)
 );
 
-
 -- Table for FOOD_ITEM
 CREATE TABLE FOOD_ITEM (
     Food_id INT AUTO_INCREMENT PRIMARY KEY,
     Price FLOAT,
-    Rating FLOAT,
+    Rating FLOAT DEFAULT 0,
     Food_name VARCHAR(100),
     Establishment_id INT,
     FOREIGN KEY (Establishment_id) REFERENCES FOOD_ESTABLISHMENT(Establishment_id)
@@ -43,7 +42,7 @@ CREATE TABLE FOOD_REVIEW (
     Review_id INT AUTO_INCREMENT PRIMARY KEY,
     Date_of_review DATE,
     Type_of_review VARCHAR(100),
-    Rating INT,
+    Rating FLOAT,
     Title VARCHAR(100),
     Suggestion TEXT,
     Customer_id INT,
@@ -62,7 +61,7 @@ CREATE TABLE FOOD_ITEM_INGREDIENT (
     PRIMARY KEY (Food_id, Ingredient)
 );
 
--- Table for MEA
+-- Table for MEAT
 CREATE TABLE MEAT (
     Food_id INT,
     Meat_type VARCHAR(50),
@@ -150,4 +149,3 @@ BEGIN
 END;
 //
 DELIMITER ;
-reviewsystemdb

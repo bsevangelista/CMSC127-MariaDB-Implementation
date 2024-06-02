@@ -3,11 +3,17 @@ import server
 def add_food_item():
     try:
         establishment_id = input("Enter Establishment ID: ").strip()
-        food_name = input("Enter Food Name: ").strip()
+        
+        # Check if the establishment exists
+        if not server.isEstablishmentExists(establishment_id):
+            print("Establishment ID does not exist. Please enter a valid Establishment ID.")
+            return
+        
+        name = input("Enter Food Name: ").strip()
         price = input("Enter Price: ").strip()
-        rating = input("Enter Rating (1-5): ").strip()
+        description = input("Enter Food Description: ").strip()
 
-        server.addFoodItem(establishment_id, food_name, price, rating)
+        server.addFoodItem(establishment_id, name, price, description)
         print("Food Item added successfully!")
     except Exception as e:
         print(f"Error: {e}")
@@ -17,9 +23,8 @@ def update_food_item():
         food_id = input("Enter Food ID to update: ").strip()
         food_name = input("Enter new Food Name: ").strip()
         price = input("Enter new Price: ").strip()
-        rating = input("Enter new Rating (1-5): ").strip()
 
-        server.updateFoodItem(food_id, food_name, price, rating)
+        server.updateFoodItem(food_id, food_name, price)
         print("Food Item updated successfully!")
     except Exception as e:
         print(f"Error: {e}")
