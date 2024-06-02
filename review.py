@@ -308,4 +308,4 @@ def home(customer_id):
             print("Invalid option. Please try again.")
         
 # for testing only
-home(6)
+# home(6)
