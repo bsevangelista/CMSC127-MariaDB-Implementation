@@ -802,3 +802,30 @@ def updateReview(review_id, title, suggestion, rating):
     finally:
         cursor.close()
         connection.close()
+
+def deleteReview(review_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return False
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        DELETE FROM FOOD_REVIEW 
+        WHERE review_id = %s
+        """
+        
+        cursor.execute(query, (review_id,))
+        connection.commit()
+        print("Review deleted successfully.")
+        return True
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return False
+    
+    finally:
+        cursor.close()
+        connection.close()

@@ -242,6 +242,47 @@ def update_review(customer_id):
     except Exception as e:
         print(e)
 
+def delete_review(customer_id):
+    try:
+        reviews = get_all_user_review(customer_id)
+        if reviews is False:
+            print("Failed to retrieve reviews.")
+            return
+        elif reviews is None:
+            print("No review found.")
+            return
+        else:
+            print("------------------Reviews-----------------")
+            print()
+            for review in reviews:
+                review_id, title, suggestion, rating, item_name, establishment_name = review
+                print(f"Review ID: \t\t{review_id}")
+                if not item_name:
+                    print(f"Review Subject: \t{establishment_name}")
+                else:
+                    print(f"Review Subject: \t{item_name} of {establishment_name}")
+                print(f"Review title: \t\t{title}")
+                print(f"Review suggestion: \t{suggestion}")
+                print(f"Review rating: \t\t{rating}")
+                print()
+            print("------------------Reviews-----------------")
+        
+        while True:
+            review_id = str(input("Enter Review ID to Delete: "))
+            if not review_id:
+                print("Review ID Required!")
+                continue
+            review = get_review(review_id)
+            if not review:
+                print("Review Not Found!")
+                continue
+            break
+            
+        server.deleteReview(review_id)
+        return
+    except Exception as e:
+        print(e)
+
 def home(customer_id):
     while True:
         print("------------------Review------------------")
@@ -268,4 +309,4 @@ def home(customer_id):
             print("Invalid option. Please try again.")
         
 # for testing only
-update_review(6)
+delete_review(6)
