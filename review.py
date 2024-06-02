@@ -65,7 +65,7 @@ def add_food_establishment_review(customer_id):
                 print("Rating Required!")
                 continue
             try:
-                rating = float(rating_input)
+                rating = int(rating_input)
                 if not 0 <= rating <= 5:
                     print("Rating must be between 0 and 5.")
                     continue
@@ -153,7 +153,7 @@ def add_food_item_review(customer_id):
                 print("Rating Required!")
                 continue
             try:
-                rating = float(rating_input)
+                rating = int(rating_input)
                 if not 0 <= rating <= 5:
                     print("Rating must be between 0 and 5.")
                     continue
