@@ -1,36 +1,56 @@
 import server
 
+def display_food_establishment():
+    try:
+        establishments = server.get_all_food_establishments()
+
+        if establishments:
+            print("----------- Food Establishments -----------")
+            print("| Establishment ID | Name                | Barangay     | Postal Code | Street Name | City         | Province   | Food Type Served | Average Rating | Price Range |")
+            print("-" * 116)
+
+            for establishment in establishments:
+                establishment_id, name, barangay, postal_code, street_name, city, province, food_type_served, average_rating, price_range = establishment
+                print(f"| {establishment_id:<17} | {name:<20} | {barangay:<12} | {postal_code:<11} | {street_name:<12} | {city:<12} | {province:<10} | {food_type_served:<17} | {average_rating:<14} | {price_range:<11} |")
+
+            print("-" * 116)
+        else:
+            print("No food establishments found.")
+    except Exception as e:
+        print(f"Error: {e}")
+
 def add_food_establishment():
     try:
-        estab_name = input("Enter Establishment Name: ").strip()
-        baranggay = input("Enter Baranggay: ").strip()
+        name = input("Enter Establishment Name: ").strip()
+        barangay = input("Enter Barangay: ").strip()
         postal_code = input("Enter Postal Code: ").strip()
-        street = input("Enter Street: ").strip()
+        street_name = input("Enter Street Name: ").strip()
         city = input("Enter City: ").strip()
         province = input("Enter Province: ").strip()
-        rating = input("Enter Rating (1-5): ").strip()
-        average_price = input("Enter Average Price: ").strip()
-        food_type_served = input("Enter Food Type Served: ").strip()
+        type_of_food_served = input("Enter Food Type Served: ").strip()
 
-        server.addFoodEstablishment(estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served)
+        # Set default values of average_rating and price_range to 0
+        average_rating = 0
+        price_range = 0
+
+        server.addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, price_range)
         print("Food Establishment added successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
+
 def update_food_establishment():
     try:
         establishment_id = input("Enter Establishment ID to update: ").strip()
-        estab_name = input("Enter new Establishment Name: ").strip()
-        baranggay = input("Enter new Baranggay: ").strip()
+        name = input("Enter new Establishment Name: ").strip()
+        barangay = input("Enter new barangay: ").strip()
         postal_code = input("Enter new Postal Code: ").strip()
-        street = input("Enter new Street: ").strip()
+        street_name = input("Enter new street_name: ").strip()
         city = input("Enter new City: ").strip()
         province = input("Enter new Province: ").strip()
-        rating = input("Enter new Rating (1-5): ").strip()
-        average_price = input("Enter new Average Price: ").strip()
-        food_type_served = input("Enter new Food Type Served: ").strip()
+        type_of_food_served = input("Enter new Food Type Served: ").strip()
 
-        server.updateFoodEstablishment(establishment_id, estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served)
+        server.updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served)
         print("Food Establishment updated successfully!")
     except Exception as e:
         print(f"Error: {e}")
@@ -81,5 +101,8 @@ def home():
         elif choice == 4:
             print("Search Food Establishment selected.")
             search_food_establishment()    
+        elif choice == 5:
+            print("Display Food Establishments selected.")
+            display_food_establishment()
         else:
             print("Invalid option. Please try again.")
