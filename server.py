@@ -399,21 +399,60 @@ def addFoodItem(establishment_id, name, price, description):
 
 
 
-def updateFoodItem(food_id, name, price, rating):
+def deleteFoodItem(food_id):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
         return
+    
+    try:
+        cursor = connection.cursor()
+
+        # Get the establishment_id for the food item
+        cursor.execute("SELECT establishment_id FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
+        establishment_id = cursor.fetchone()[0]
+        
+        # Delete the food item
+        query = "DELETE FROM FOOD_ITEM WHERE Food_id = %s"
+        cursor.execute(query, (food_id,))
+        
+        # Update the average price
+        updateAveragePrice(establishment_id, cursor)
+        
+        connection.commit()
+        print("Food Item deleted successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def updateFoodItem(food_id, name, price):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    
     try:
         cursor = connection.cursor()
         
         query = """
         UPDATE FOOD_ITEM
-        SET name = %s, Price = %s, Rating = %s
+        SET name = %s, price = %s
         WHERE Food_id = %s
         """
         
-        cursor.execute(query, (name, price, rating, food_id))
+        cursor.execute(query, (name, price, food_id))
+
+        # Get the establishment_id for the food item
+        cursor.execute("SELECT establishment_id FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
+        establishment_id = cursor.fetchone()[0]
+        
+        # Update the average price
+        updateAveragePrice(establishment_id, cursor)
+        
         connection.commit()
         print("Food Item updated successfully!")
     
@@ -424,29 +463,6 @@ def updateFoodItem(food_id, name, price, rating):
         cursor.close()
         connection.close()
 
-def deleteFoodItem(food_id):
-    connection = dbConnection()
-    if connection is None:
-        print("Failed to connect to the database.")
-        return
-    try:
-        cursor = connection.cursor()
-        
-        query = """
-        DELETE FROM FOOD_ITEM
-        WHERE Food_id = %s
-        """
-        
-        cursor.execute(query, (food_id,))
-        connection.commit()
-        print("Food Item deleted successfully!")
-    
-    except mariaDB.Error as e:
-        print(f"Error: {e}")
-    
-    finally:
-        cursor.close()
-        connection.close()
 
 def searchFoodItem(search_term):
     connection = dbConnection()
