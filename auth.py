@@ -59,18 +59,12 @@ def admin_signIn():
             continue
         break
     
-    result = server.admin_signIn(email, password)
-    
-    if result == 'success':
-        print("Admin Sign In successful!")
+    if server.admin_signIn(email, password):
+        # Redirect to admin menu
+        import admin_menu
         admin_menu.admin_menu()
-    elif result == 'email_not_found':
-        print("Admin email not found.")
-    elif result == 'incorrect_password':
-        print("Incorrect password. Please try again.")
     else:
-        print("An error occurred during admin sign in.")
-    return
+        return
 
 def signUp():
     while True:

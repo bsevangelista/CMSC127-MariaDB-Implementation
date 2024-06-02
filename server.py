@@ -187,17 +187,13 @@ def admin_signIn(email, password):
 
 ########## FUNCTIONS FOR ADDING A FOOD ESTABLISHMENT ##########
 
-# Function for adding a food establishment
-def addFoodEstablishment(estab_name,
-                         baranggay,
-                         postal_code,
-                         street,
-                         city,
-                         province,
-                         rating, 
-                         average_price, 
-                         food_type_served):
-    
+
+#########################################################################################################
+#                                                                                                       #
+#                               Function for adding a food establishment                                #
+#                                                                                                       #
+#########################################################################################################
+def addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating=0, price_range=0):
     connection = dbConnection()
 
     if connection is None:
@@ -208,21 +204,21 @@ def addFoodEstablishment(estab_name,
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO FOOD_ESTABLISHMENT (Estab_name, Baranggay, Postal_code, Street, City, Province, Rating, Average_price, Food_type_served)
+        INSERT INTO FOOD_ESTABLISHMENT (name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, price_range)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
-        cursor.execute(query,(estab_name,
-                                baranggay,
-                                postal_code,
-                                street,
-                                city,
-                                province,
-                                rating, 
-                                average_price, 
-                                food_type_served))
-        
+        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, price_range))
         connection.commit()
+        
+        establishment_id = cursor.lastrowid  # Get the last inserted establishment ID
+        
+        # Compute and update the average price
+        updateAveragePrice(establishment_id, cursor)
+        
+        # Compute and update the rating
+        updateAverageRating(establishment_id, cursor)
+        
         print("Food Establishment added successfully!")
 
     except mariaDB.Error as e:
@@ -232,8 +228,12 @@ def addFoodEstablishment(estab_name,
         cursor.close()
         connection.close()
 
-# Function for updating food establishment
-def updateFoodEstablishment(establishment_id, estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served):
+#########################################################################################################
+#                                                                                                       #
+#                               Function for updating a food establishment                             #
+#                                                                                                       #
+#########################################################################################################
+def updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -244,12 +244,19 @@ def updateFoodEstablishment(establishment_id, estab_name, baranggay, postal_code
         
         query = """
         UPDATE FOOD_ESTABLISHMENT
-        SET Estab_name = %s, Baranggay = %s, Postal_code = %s, Street = %s, City = %s, Province = %s, Rating = %s, Average_price = %s, Food_type_served = %s
+        SET name = %s, barangay = %s, postal_code = %s, street_name = %s, city = %s, province = %s, type_of_food_served = %s
         WHERE Establishment_id = %s
         """
         
-        cursor.execute(query, (estab_name, baranggay, postal_code, street, city, province, rating, average_price, food_type_served, establishment_id))
+        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, type_of_food_served, establishment_id))
         connection.commit()
+        
+        # Compute and update the average price
+        updateAveragePrice(establishment_id, cursor)
+        
+        # Compute and update the rating
+        updateAverageRating(establishment_id, cursor)
+        
         print("Food Establishment updated successfully!")
     
     except mariaDB.Error as e:
@@ -259,6 +266,11 @@ def updateFoodEstablishment(establishment_id, estab_name, baranggay, postal_code
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                                                                                       #
+#                               Function for deleting a food establishment                              #
+#                                                                                                       #
+#########################################################################################################
 def deleteFoodEstablishment(establishment_id):
     connection = dbConnection()
     if connection is None:
@@ -281,6 +293,11 @@ def deleteFoodEstablishment(establishment_id):
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                                                                                       #
+#                               Function for searching a food establishment                             #
+#                                                                                                       #
+#########################################################################################################
 def searchFoodEstablishment(search_term):
     connection = dbConnection()
     if connection is None:
@@ -292,7 +309,7 @@ def searchFoodEstablishment(search_term):
         
         query = """
         SELECT * FROM FOOD_ESTABLISHMENT
-        WHERE Estab_name LIKE %s OR City LIKE %s OR Province LIKE %s
+        WHERE name LIKE %s OR city LIKE %s OR province LIKE %s
         """
         
         like_term = f"%{search_term}%"
@@ -309,3 +326,175 @@ def searchFoodEstablishment(search_term):
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                                                                                       #
+#               Function for getting the rating amd the average price of an establishment               #
+#                                                                                                       #
+#########################################################################################################
+def updateAveragePrice(establishment_id, cursor):   
+    try:
+        query = """
+        SELECT AVG(Price) FROM FOOD_ITEM WHERE Establishment_id = %s
+        """
+        cursor.execute(query, (establishment_id,))
+        avg_price = cursor.fetchone()[0] or 0
+        
+        update_query = """
+        UPDATE FOOD_ESTABLISHMENT SET price_range = %s WHERE Establishment_id = %s
+        """
+        cursor.execute(update_query, (avg_price, establishment_id))
+    except mariaDB.Error as e:
+        print(f"Error in updating average price: {e}")
+
+def updateAverageRating(establishment_id, cursor):
+    try:
+        query = """
+        SELECT AVG(Rating) FROM FOOD_REVIEW WHERE Establishment_id = %s
+        """
+        cursor.execute(query, (establishment_id,))
+        average_rating = cursor.fetchone()[0] or 0
+        
+        update_query = """
+        UPDATE FOOD_ESTABLISHMENT SET Rating = %s WHERE Establishment_id = %s
+        """
+        cursor.execute(update_query, (average_rating, establishment_id))
+    except mariaDB.Error as e:
+        print(f"Error in updating average rating: {e}")
+
+
+#########################################################################################################
+#                                                                                                       #
+#                                Function for displaying the establishments                             #
+#                                                                                                       #
+#########################################################################################################
+def get_all_food_establishments():
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+    
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT * FROM FOOD_ESTABLISHMENT
+        """
+        
+        cursor.execute(query)
+        results = cursor.fetchall()
+        
+        return results
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return []
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+
+#########################################################################################################
+#                                                                                                       #
+#                                   Function for adding the food item                                   #
+#                                                                                                       #
+#########################################################################################################
+def addFoodItem(establishment_id, food_name, price, rating):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        INSERT INTO FOOD_ITEM (Establishment_id, Food_name, Price, Rating)
+        VALUES (%s, %s, %s, %s)
+        """
+        
+        cursor.execute(query, (establishment_id, food_name, price, rating))
+        connection.commit()
+        print("Food Item added successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def updateFoodItem(food_id, food_name, price, rating):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        UPDATE FOOD_ITEM
+        SET Food_name = %s, Price = %s, Rating = %s
+        WHERE Food_id = %s
+        """
+        
+        cursor.execute(query, (food_name, price, rating, food_id))
+        connection.commit()
+        print("Food Item updated successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def deleteFoodItem(food_id):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        DELETE FROM FOOD_ITEM
+        WHERE Food_id = %s
+        """
+        
+        cursor.execute(query, (food_id,))
+        connection.commit()
+        print("Food Item deleted successfully!")
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+def searchFoodItem(search_term):
+    connection = dbConnection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+    try:
+        cursor = connection.cursor()
+        
+        query = """
+        SELECT * FROM FOOD_ITEM
+        WHERE Food_name LIKE %s OR Price LIKE %s OR Rating LIKE %s
+        """
+        
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term, like_term, like_term))
+        results = cursor.fetchall()
+        
+        return results
+    
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return []
+    
+    finally:
+        cursor.close()
+        connection.close()
