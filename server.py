@@ -781,7 +781,16 @@ def updateReview(review_id, title, suggestion, rating):
     
     try:
         cursor = connection.cursor()
+        cursor.execute("SELECT establishment_id FROM FOOD_REVIEW WHERE review_id = %s", (review_id,))
+        result = cursor.fetchone()
+
+        if result is None:
+            print("Review not found.")
+            return False
         
+        establishment_id = result[0]
+
+        # Update the review
         query = """
         UPDATE FOOD_REVIEW 
         SET title = %s, suggestion = %s, rating = %s 
@@ -789,8 +798,17 @@ def updateReview(review_id, title, suggestion, rating):
         """
         
         cursor.execute(query, (title, suggestion, rating, review_id))
+
+        # Update AverageRating
+        updateAverageRating(establishment_id, cursor)
+
+        
         connection.commit()
+
+        # After updating the review, update the average rating
+        updateAverageRating(establishment_id, cursor)
         print("Review updated successfully.")
+
         return True
     
     except mariaDB.Error as e:
@@ -809,15 +827,26 @@ def deleteReview(review_id):
     
     try:
         cursor = connection.cursor()
+
+        # Get the establishment_id for the review
+        cursor.execute("SELECT establishment_id FROM FOOD_REVIEW WHERE review_id = %s", (review_id,))
+        result = cursor.fetchone()
         
-        query = """
-        DELETE FROM FOOD_REVIEW 
-        WHERE review_id = %s
-        """
+        if result is None:
+            print("Review not found.")
+            return False
+
+        establishment_id = result[0]
         
+        # Delete the review
+        query = "DELETE FROM FOOD_REVIEW WHERE review_id = %s"
         cursor.execute(query, (review_id,))
+        
+        # Update the average rating
+        updateAverageRating(establishment_id, cursor)
+        
         connection.commit()
-        print("Review deleted successfully.")
+        print("Review deleted successfully!")
         return True
     
     except mariaDB.Error as e:
@@ -827,5 +856,4 @@ def deleteReview(review_id):
     finally:
         cursor.close()
         connection.close()
-
 
