@@ -1,87 +1,98 @@
-CREATE DATABASE FoodReviewDB;
+CREATE DATABASE IF NOT EXISTS FoodReviewDB;
 USE FoodReviewDB;
+
+-- Table for ADMIN
+CREATE TABLE ADMIN (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL
+);
 
 -- Table for CUSTOMER
 CREATE TABLE CUSTOMER (
-    Customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    First_name VARCHAR(50),
-    Middle_name VARCHAR(50),
-    Last_name VARCHAR(50),
-    Birthday DATE,
-    Age INT,
-    Email VARCHAR(100),
-    Password VARCHAR(100)
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    birthday DATE NOT NULL,
+    age INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 -- Table for FOOD_ESTABLISHMENT
 CREATE TABLE FOOD_ESTABLISHMENT (
-    Establishment_id INT AUTO_INCREMENT PRIMARY KEY,
-    Estab_name VARCHAR(100),
-    Baranggay VARCHAR(100),
-    Postal_code VARCHAR(10),
-    Street VARCHAR(100),
-    City VARCHAR(50),
-    Province VARCHAR(50),
-    Rating FLOAT DEFAULT 0, -- Initial value set to 0
-    Average_price FLOAT DEFAULT 0, -- Initial value set to 0
-    food_type_served VARCHAR(100)
+    establishment_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    baranggay VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(25) NOT NULL,
+    street VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    province VARCHAR(100) NOT NULL,
+    rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
+    average_price DECIMAL(6,2) DEFAULT 0, -- Initial value set to 0
+    food_type_served VARCHAR(100) NOT NULL
 );
 
 -- Table for FOOD_ITEM
 CREATE TABLE FOOD_ITEM (
-    Food_id INT AUTO_INCREMENT PRIMARY KEY,
-    Price FLOAT,
-    Rating FLOAT DEFAULT 0,
-    Food_name VARCHAR(100),
-    Establishment_id INT,
-    FOREIGN KEY (Establishment_id) REFERENCES FOOD_ESTABLISHMENT(Establishment_id)
+    food_id INT AUTO_INCREMENT PRIMARY KEY,
+    price DECIMAL(6,2) NOT NULL,
+    rating DECIMAL(2,1) NOT NULL DEFAULT 0, -- Initial value set to 0
+    name VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    establishment_id INT,
+    FOREIGN KEY (establishment_id) REFERENCES FOOD_ESTABLISHMENT(establishment_id)
 );
 
 -- Table for FOOD_REVIEW
 CREATE TABLE FOOD_REVIEW (
-    Review_id INT AUTO_INCREMENT PRIMARY KEY,
-    Date_of_review DATE,
-    Type_of_review VARCHAR(100),
-    Rating FLOAT,
-    Title VARCHAR(100),
-    Suggestion TEXT,
-    Customer_id INT,
-    Establishment_id INT,
-    Food_id INT,
-    FOREIGN KEY (Customer_id) REFERENCES CUSTOMER(Customer_id),
-    FOREIGN KEY (Establishment_id) REFERENCES FOOD_ESTABLISHMENT(Establishment_id),
-    FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id)
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    review_date DATE NOT NULL,
+    review_time TIME NOT NULL,
+    type_of_review VARCHAR(50) NOT NULL,
+    rating DECIMAL(2,1) NOT NULL DEFAULT 0,
+    title VARCHAR(255) NOT NULL,
+    suggestion TEXT NOT NULL,
+    customer_id INT,
+    establishment_id INT,
+    food_id INT,
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id),
+    FOREIGN KEY (establishment_id) REFERENCES FOOD_ESTABLISHMENT(establishment_id),
+    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id)
 );
 
 -- Table for FOOD_ITEM_INGREDIENT
 CREATE TABLE FOOD_ITEM_INGREDIENT (
-    Food_id INT,
-    Ingredient VARCHAR(100),
-    FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id),
-    PRIMARY KEY (Food_id, Ingredient)
+    food_id INT,
+    ingredient VARCHAR(100),
+    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
+    PRIMARY KEY (food_id, ingredient)
 );
 
 -- Table for MEAT
 CREATE TABLE MEAT (
-    Food_id INT,
-    Meat_type VARCHAR(50),
-    FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id),
-    PRIMARY KEY (Food_id, Meat_type)
+    food_id INT,
+    meat_type VARCHAR(100),
+    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
+    PRIMARY KEY (food_id, meat_type)
 );
 
 -- Table for VEGETABLE
 CREATE TABLE VEGETABLE (
-    Food_id INT,
-    Vegetable_type VARCHAR(50),
-    FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id),
-    PRIMARY KEY (Food_id, Vegetable_type)
+    food_id INT,
+    vegetable_type VARCHAR(100),
+    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
+    PRIMARY KEY (food_id, vegetable_type)
 );
 
 -- Table for DESSERT
 CREATE TABLE DESSERT (
-    Food_id INT,
-    Dessert_type VARCHAR(50),
-    FOREIGN KEY (Food_id) REFERENCES FOOD_ITEM(Food_id),
-    PRIMARY KEY (Food_id, Dessert_type)
+    food_id INT,
+    dessert_type VARCHAR(100),
+    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
+    PRIMARY KEY (food_id, dessert_type)
 );
 
