@@ -31,9 +31,9 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     street_name VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     province VARCHAR(100) NOT NULL,
-    rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
+    average_rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
     average_price DECIMAL(6,2) DEFAULT 0, -- Initial value set to 0
-    food_type_served VARCHAR(100) NOT NULL
+    type_of_food_served VARCHAR(100) NOT NULL
 );
 
 -- Table for FOOD_ITEM

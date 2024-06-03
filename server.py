@@ -4,10 +4,10 @@ def dbConnection():
     try:
         connection = mariaDB.connect(
             user='root',
-            password='iamnicoantonio1124',
+            password='trixiabanzon',
             host='localhost',  
             port=3306,         
-            database='reviewsystemdb'  
+            database='foodreviewdb'  
         )
         return connection
     except mariaDB.Error as e:
