@@ -31,10 +31,10 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     street_name VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     province VARCHAR(100) NOT NULL,
-    rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
-    average_price DECIMAL(6,2) DEFAULT 0, -- Initial value set to 0
+    average_rating DECIMAL(2,1) NOT NULL DEFAULT 0, -- Initial value set to 0
+    average_price DECIMAL(6,2) NOT NULL DEFAULT 0, -- Initial value set to 0
 );
-
+w
 -- Table for FOOD_ITEM
 CREATE TABLE FOOD_ITEM (
     food_id INT AUTO_INCREMENT PRIMARY KEY,
