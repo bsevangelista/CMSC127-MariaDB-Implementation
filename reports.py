@@ -55,6 +55,16 @@ def report_two():
             return
         else:
             establishment_id = input("\nEnter establishment ID: ")
+            query_test = "SELECT * FROM food_establishment WHERE establishment_id = %s"
+            cursor.execute(query_test, (establishment_id,))
+
+            rows_test = cursor.fetchall()
+            if not rows_test:
+                print("\nNo establishment found.")
+                cursor.close()
+                connection.close()
+                return
+
             query = "SELECT * FROM food_review WHERE establishment_id = %s AND type_of_review = 'Food Establishment'"
             cursor.execute(query, (establishment_id,))
 
@@ -66,6 +76,16 @@ def report_two():
             return
         else:
             food_id = input("\nEnter food ID: ")
+            query_test = "SELECT * FROM food_item WHERE food_id = %s"
+            cursor.execute(query_test, (food_id,))
+
+            rows_test = cursor.fetchall()
+            if not rows_test:
+                print("\nNo food item found.")
+                cursor.close()
+                connection.close()
+                return
+            
             query = "SELECT * FROM food_review WHERE food_id = %s"
             cursor.execute(query, (food_id,))
         
@@ -80,9 +100,9 @@ def report_two():
 
     if not rows:
         if choice == '1':
-            print("\nFood establishment does not exist.")
+            print("\nNo review found for food establishment.")
         elif choice == '2':
-            print("\nFood item does not exist.")
+            print("\nNo review found for food item.")
         cursor.close()
         connection.close()
         return
@@ -235,6 +255,15 @@ def report_five():
             return        
         else:
             establishment_id = input("Enter establishment ID: ")
+            query_test = "SELECT * FROM food_establishment WHERE establishment_id = %s"
+            cursor.execute(query_test, (establishment_id,))
+
+            rows_test = cursor.fetchall()
+            if not rows_test:
+                print("\nNo establishment found.")
+                cursor.close()
+                connection.close()
+                return
             query = "SELECT * FROM food_review WHERE establishment_id = %s AND type_of_review = 'Food Establishment' AND review_date >= DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH)"
             cursor.execute(query, (establishment_id,))
     elif choice == '2':
@@ -245,6 +274,15 @@ def report_five():
             return        
         else:
             food_id = input("\nEnter food ID: ")
+            query_test = "SELECT * FROM food_item WHERE food_id = %s"
+            cursor.execute(query_test, (food_id,))
+
+            rows_test = cursor.fetchall()
+            if not rows_test:
+                print("\nNo food item found.")
+                cursor.close()
+                connection.close()
+                return
             query = "SELECT * FROM food_review WHERE food_id = %s AND review_date >= DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH)"
             cursor.execute(query, (food_id,))
     else:
@@ -258,9 +296,9 @@ def report_five():
 
     if not rows:
         if choice == '1':
-            print("\nFood establishment does not exist.")
+            print("\nNo review found for food establishment.")
         elif choice == '2':
-            print("\nFood item does not exist.")
+            print("\nNo review found for food item.")
         cursor.close()
         connection.close()
         return
@@ -295,7 +333,7 @@ def report_six():
     rows = cursor.fetchall()
 
     if not rows:
-        print("\nNo establishments with average equal to or greater than 4.")
+        print("\nNo establishments with average rating equal to or greater than 4.")
         cursor.close()
         connection.close()
         return
@@ -380,15 +418,60 @@ def report_eight():
             connection.close()
             return
         
-        food_type = input("Enter food type (meat/veg/dessert): ")
-        if food_type != 'meat' and food_type != 'veg' and food_type != 'dessert':
-            print(food_type)
+        food_type = input("Enter food type (meat/vegetable/dessert): ")
+        if food_type != 'meat' and food_type != 'vegetable' and food_type != 'dessert':
             print('Invalid option.')
             cursor.close()
             connection.close()
-            return        
-        min_price = float(input("Enter minimum price: "))
-        max_price = float(input("Enter maximum price: "))
+            return
+
+        if food_type == 'meat':
+            query_test = "SELECT * FROM food_item WHERE food_type = %s"
+            cursor.execute(query_test, (food_type,))
+            rows_test = cursor.fetchall()
+
+            if not rows_test:
+                print("\nNo meat items found.")
+                cursor.close()
+                connection.close()
+                return
+            
+        elif food_type == 'vegetable':
+            query_test = "SELECT * FROM food_item WHERE food_type = %s"
+            cursor.execute(query_test, (food_type,))
+            rows_test = cursor.fetchall()
+
+            if not rows_test:
+                print("\nNo vegetable items found.")
+                cursor.close()
+                connection.close()
+                return
+            
+        elif food_type == 'dessert':
+            query_test = "SELECT * FROM food_item WHERE food_type = %s"
+            cursor.execute(query_test, (food_type,))
+            rows_test = cursor.fetchall()
+
+            if not rows_test:
+                print("\nNo dessert items found.")
+                cursor.close()
+                connection.close()
+                return
+            
+        while True:
+            try:
+                min_price = float(input("Enter minimum price: "))
+                break
+            except ValueError:
+                print('Invalid price. Please enter a valid number.')
+
+        while True:
+            try:
+                max_price = float(input("Enter maximum price: "))
+                break  
+            except ValueError:
+                print('Invalid price. Please enter a valid number.')
+
 
     # Execute the query
     query = "SELECT * FROM food_item WHERE establishment_id = %s AND price BETWEEN %s AND %s AND food_type = %s"
@@ -399,7 +482,7 @@ def report_eight():
 
     # Check if no rows are returned and print the appropriate message
     if not rows:
-        print(f"No {food_type.lower()} items found.")
+        print(f"\nNo {food_type.lower()} items found in that price range.")
     else:
         # Fetch column names
         column_names = [desc[0] for desc in cursor.description]
