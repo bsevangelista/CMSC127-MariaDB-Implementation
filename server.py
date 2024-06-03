@@ -316,12 +316,6 @@ def searchFoodEstablishment(search_term):
 #########################################################################################################
 def updateAveragePrice(establishment_id, cursor):
     try:
-        # Establish a new connection
-        connection = dbConnection()
-        if connection is None:
-            print("Failed to connect to the database.")
-            return False
-
         # Update the average price in the FOOD_ESTABLISHMENT table
         update_query = """
         UPDATE FOOD_ESTABLISHMENT 
@@ -329,13 +323,11 @@ def updateAveragePrice(establishment_id, cursor):
         WHERE establishment_id = %s
         """
         cursor.execute(update_query, (establishment_id, establishment_id))
-        connection.commit()
+
         print("Average price for establishment updated successfully!")
     except mariaDB.Error as e:
         print(f"Error in updating average price: {e}")
-    finally:
-        cursor.close()
-        connection.close()
+
 
 
 #########################################################################################################
@@ -424,11 +416,11 @@ def addFoodItem(establishment_id, name, price, description, food_type,specific_t
         elif food_type == 'Dessert':
             specific_query = "INSERT INTO DESSERT (food_id, dessert_type) VALUES (%s, %s)"
             cursor.execute(specific_query, (food_id, specific_type))
-
-        # Update the average price after adding a new food item
         updateAveragePrice(establishment_id, cursor)
-
         connection.commit()
+        # Update the average price after adding a new food item
+        
+        
         print("Food Item added successfully!")
     
     except mariaDB.Error as e:
@@ -475,11 +467,12 @@ def deleteFoodItem(food_id):
 
         # Delete the food item from FOOD_ITEM table
         cursor.execute("DELETE FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
-        
         # Update the average price
         updateAveragePrice(establishment_id, cursor)
-        
         connection.commit()
+        
+        
+        
         print("Food Item deleted successfully!")
     
     except mariaDB.Error as e:
@@ -512,11 +505,10 @@ def updateFoodItem(food_id, price, description):
         # Get the establishment_id for the food item
         cursor.execute("SELECT establishment_id FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
         establishment_id = cursor.fetchone()[0]
-        
         # Update the average price
         updateAveragePrice(establishment_id, cursor)
-        
         connection.commit()
+        
         print("Food Item updated successfully!")
     
     except mariaDB.Error as e:
@@ -711,6 +703,51 @@ def getItemIdByName(item_name, establishment_id):
 #########################################################################################################
 #                                   Function for adding the food establishment review                   #
 #########################################################################################################
+
+def updateAverageFoodItemRating(food_id, cursor):
+    try:
+        
+        update_query = """
+        UPDATE FOOD_ITEM 
+        SET rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s), 0)
+        WHERE food_id = %s
+        """
+        cursor.execute(update_query, (food_id, food_id))
+        #print("Average rating for food item updated successfully!")
+        
+    except mariaDB.Error as e:
+        print(f"Error in updating average rating: {e}")
+
+# AVERAGE THE FOOD_ESTABLISHMENT REVIEW
+def updateAverageRating(establishment_id, cursor):
+    try:
+        
+        update_query = """
+        UPDATE FOOD_ESTABLISHMENT 
+        SET average_rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s), 0)
+        WHERE establishment_id = %s
+        """
+        cursor.execute(update_query, (establishment_id, establishment_id))
+        #print("Average rating updated successfully!")
+        
+    except mariaDB.Error as e:
+        print(f"Error in updating average rating: {e}")
+
+# AVERAGE THE FOOD_ESTABLISHMENT REVIEW
+def updateItemRating(food_id, cursor):
+    try:
+        
+        update_query = """
+        UPDATE FOOD_ITEM 
+        SET rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s), 0)
+        WHERE food_id = %s
+        """
+        cursor.execute(update_query, (food_id, food_id))
+        #print("Average rating updated successfully!")
+        
+    except mariaDB.Error as e:
+        print(f"Error in updating average rating: {e}")
+
 def addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_id, establishment_id):
     connection = dbConnection()
     if connection is None:
@@ -726,40 +763,14 @@ def addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_
         """
         
         cursor.execute(query, (review_type, rating, title, suggestion, customer_id, establishment_id))
-        connection.commit()
         updateAverageRating(establishment_id, cursor)
+        connection.commit()
+        
         print("Review added successfully!")
     
     except mariaDB.Error as e:
         print(f"Error: {e}")
     
-    finally:
-        cursor.close()
-        connection.close()
-
-
-# AVERAGE THE FOOD_ESTABLISHMENT REVIEW
-def updateAverageRating(establishment_id, cursor):
-    try:
-        connection = dbConnection()
-        if connection is None:
-            print("Failed to connect to database")
-            return False
-    
-        cursor = connection.cursor()
-        
-        update_query = """
-        UPDATE FOOD_ESTABLISHMENT 
-        SET average_rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s), 0)
-        WHERE establishment_id = %s
-        """
-        cursor.execute(update_query, (establishment_id, establishment_id))
-        connection.commit()
-        #print("Average rating updated successfully!")
-        
-    except mariaDB.Error as e:
-        print(f"Error in updating average rating: {e}")
-        
     finally:
         cursor.close()
         connection.close()
@@ -854,6 +865,12 @@ def updateReview(review_id, title, suggestion, rating):
             return False
         
         establishment_id = result[0]
+        
+        cursor.execute("SELECT food_id FROM FOOD_REVIEW WHERE review_id = %s", (review_id,))
+        result = cursor.fetchone()
+
+        if result:
+            food_id = result[0]
 
         # Update the review
         query = """
@@ -864,11 +881,13 @@ def updateReview(review_id, title, suggestion, rating):
         
         cursor.execute(query, (title, suggestion, rating, review_id))
 
-        
-        connection.commit()
-
         # After updating the review, update the average rating
         updateAverageRating(establishment_id, cursor)
+        if food_id:
+            updateItemRating(food_id, cursor)
+        connection.commit()
+
+        
         print("Review updated successfully.")
 
         return True
@@ -900,13 +919,22 @@ def deleteReview(review_id):
 
         establishment_id = result[0]
         
+        cursor.execute("SELECT food_id FROM FOOD_REVIEW WHERE review_id = %s", (review_id,))
+        result = cursor.fetchone()
+
+        if result:
+            food_id = result[0]
+        
         # Delete the review
         query = "DELETE FROM FOOD_REVIEW WHERE review_id = %s"
         cursor.execute(query, (review_id,))
-        connection.commit()
-        
         # Update the average rating
         updateAverageRating(establishment_id, cursor)
+        if food_id:
+            updateItemRating(food_id, cursor)
+        connection.commit()
+        
+        
         print("Review deleted successfully!")
         return True
     
@@ -934,9 +962,10 @@ def addFoodItemReview(review_type, rating, title, suggestion, customer_id, estab
         """
         
         cursor.execute(query, (review_type, rating, title, suggestion, customer_id, establishment_id, item_id))
-        connection.commit()
         updateAverageFoodItemRating(item_id, cursor)
         updateAverageRating(establishment_id, cursor)
+        connection.commit()
+        
         print("Review added successfully!")
         
     except mariaDB.Error as e:
@@ -945,31 +974,6 @@ def addFoodItemReview(review_type, rating, title, suggestion, customer_id, estab
     finally:
         cursor.close()
         connection.close()
-
-def updateAverageFoodItemRating(food_id, cursor):
-    try:
-        connection = dbConnection()
-        if connection is None:
-            print("Failed to connect to database")
-            return False
-        
-        cursor = connection.cursor()
-        
-        update_query = """
-        UPDATE FOOD_ITEM 
-        SET rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s), 0)
-        WHERE food_id = %s
-        """
-        cursor.execute(update_query, (food_id, food_id))
-        connection.commit()
-        #print("Average rating for food item updated successfully!")
-        
-    except mariaDB.Error as e:
-        print(f"Error in updating average rating: {e}")
-        
-    finally:
-            cursor.close()
-            connection.close()
 
 # Update food_item review
 def updateFoodItemReview(review_id, title, suggestion, rating, ):
@@ -995,10 +999,9 @@ def updateFoodItemReview(review_id, title, suggestion, rating, ):
                 WHERE review_id = %s    
                 """
         cursor.execute(query(title, suggestion, rating, review_id))
+        updateAverageFoodItemRating(food_id, cursor)
         connection.commit()
 
-
-        updateAverageFoodItemRating(food_id, cursor)
         print("Review updated successfully.")
 
         return True
