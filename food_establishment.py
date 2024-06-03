@@ -1,4 +1,5 @@
 import server
+
 def show_all_establishments():
     establishments = server.getAllEstablishments()
     if establishments:
@@ -11,51 +12,77 @@ def show_all_establishments():
     else:
         print("No establishments found.")
 
+def validate_input(prompt):
+    while True:
+        user_input = input(prompt).strip()
+        if user_input:
+            return user_input
+        else:
+            print("This field cannot be empty. Please try again.")
+
+def validate_postal_code(prompt):
+    while True:
+        postal_code = input(prompt).strip()
+        if postal_code.isdigit():
+            return postal_code
+        else:
+            print("Postal code must be numeric. Please try again.")
+
+def validate_id(prompt):
+    while True:
+        id_input = input(prompt).strip()
+        if id_input.isdigit():
+            return id_input
+        else:
+            print("ID must be numeric. Please try again.")
+
 def add_food_establishment():
     try:
         show_all_establishments()
-        name = input("Enter Establishment Name: ").strip()
-        barangay = input("Enter Barangay: ").strip()
-        postal_code = input("Enter Postal Code: ").strip()
-        street_name = input("Enter Street Name: ").strip()
-        city = input("Enter City: ").strip()
-        province = input("Enter Province: ").strip()
-        type_of_food_served = input("Enter Food Type Served: ").strip()
+        name = validate_input("Enter Establishment Name: ")
+        barangay = validate_input("Enter Barangay: ")
+        postal_code = validate_postal_code("Enter Postal Code: ")
+        street_name = validate_input("Enter Street Name: ")
+        city = validate_input("Enter City: ")
+        province = validate_input("Enter Province: ")
 
         average_rating = 0
         average_price = 0
 
-        server.addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, average_price)
+        server.addFoodEstablishment(name, barangay, postal_code, street_name, city, province, average_rating, average_price)
     except Exception as e:
         print(f"Error: {e}")
 
 def update_food_establishment():
     try:
         show_all_establishments()
-        establishment_id = input("Enter Establishment ID to update: ").strip()
-        name = input("Enter new Establishment Name: ").strip()
-        barangay = input("Enter new Barangay: ").strip()
-        postal_code = input("Enter new Postal Code: ").strip()
-        street_name = input("Enter new Street Name: ").strip()
-        city = input("Enter new City: ").strip()
-        province = input("Enter new Province: ").strip()
-        type_of_food_served = input("Enter new Food Type Served: ").strip()
+        establishment_id = validate_id("Enter Establishment ID to update: ")
+        name = validate_input("Enter new Establishment Name: ")
+        barangay = validate_input("Enter new Barangay: ")
+        postal_code = validate_postal_code("Enter new Postal Code: ")
+        street_name = validate_input("Enter new Street Name: ")
+        city = validate_input("Enter new City: ")
+        province = validate_input("Enter new Province: ")
 
-        server.updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served)
+        server.updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province)
     except Exception as e:
         print(f"Error: {e}")
 
 def delete_food_establishment():
     try:
         show_all_establishments()
-        establishment_id = input("Enter Establishment ID to delete: ").strip()
+        establishment_id = validate_id("Enter Establishment ID to delete (0 to go back): ")
+        if establishment_id == '0':
+            return
         server.deleteFoodEstablishment(establishment_id)
     except Exception as e:
         print(f"Error: {e}")
 
 def search_food_establishment():
     try:
-        search_term = input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]: ").strip()
+        search_term = validate_input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE] (0 to go back): ")
+        if search_term == '0':
+            return
         results = server.searchFoodEstablishment(search_term)
         if results:
             for result in results:
@@ -98,4 +125,3 @@ def home():
                 print("Invalid option. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-            

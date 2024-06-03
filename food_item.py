@@ -24,39 +24,78 @@ def show_all_food_items():
         print("No food items found.")
         return("No food items found.")
 
+def validate_input(prompt):
+    while True:
+        user_input = input(prompt).strip()
+        if user_input:
+            return user_input
+        else:
+            print("This field cannot be empty. Please try again.")
+
+def validate_price(prompt):
+    while True:
+        price = input(prompt).strip()
+        try:
+            float(price)
+            return price
+        except ValueError:
+            print("Invalid price. Please enter a numeric value.")
+
+def validate_establishment_id(prompt):
+    while True:
+        establishment_id = input(prompt).strip()
+        if establishment_id.isdigit() and server.isEstablishmentExists(establishment_id):
+            return establishment_id
+        elif establishment_id == '0':
+            return establishment_id
+        else:
+            print("Establishment ID does not exist or is invalid. Please enter a valid Establishment ID.")
+
+def validate_food_id(prompt):
+    while True:
+        food_id = input(prompt).strip()
+        if food_id.isdigit():
+            return food_id
+        elif food_id == '0':
+            return food_id
+        else:
+            print("Food ID must be numeric. Please try again.")
+
 def add_food_item():
     try:
         show_all_establishments()
-        establishment_id = input("Enter Establishment ID: ").strip()
-        
-        # Check if the establishment exists
-        if not server.isEstablishmentExists(establishment_id):
-            print("Establishment ID does not exist. Please enter a valid Establishment ID.")
+        establishment_id = validate_establishment_id("Enter Establishment ID (0 to go back): ")
+        if establishment_id == '0':
             return
         
-        print("Select Food Type:")
-        print("[1] Meat")
-        print("[2] Vegetable")
-        print("[3] Dessert")
-        food_type_choice = input("Enter choice (1, 2, or 3): ").strip()
+        while True:
+            print("Select Food Type:")
+            print("[1] Meat")
+            print("[2] Vegetable")
+            print("[3] Dessert")
+            print("[0] Back")
+            food_type_choice = input("Enter choice (1, 2, 3, or 0 to go back): ").strip()
+            
+            if food_type_choice == '0':
+                return
+            elif food_type_choice == '1':
+                food_type = 'Meat'
+                specific_type = validate_input("Enter Meat Type: ")
+                break
+            elif food_type_choice == '2':
+                food_type = 'Vegetable'
+                specific_type = validate_input("Enter Vegetable Type: ")
+                break
+            elif food_type_choice == '3':
+                food_type = 'Dessert'
+                specific_type = validate_input("Enter Dessert Type: ")
+                break
+            else:
+                print("Invalid choice. Please enter a valid option.")
         
-        food_type = None
-        if food_type_choice == '1':
-            food_type = 'Meat'
-            specific_type = input("Enter Meat Type: ").strip()
-        elif food_type_choice == '2':
-            food_type = 'Vegetable'
-            specific_type = input("Enter Vegetable Type: ").strip()
-        elif food_type_choice == '3':
-            food_type = 'Dessert'
-            specific_type = input("Enter Dessert Type: ").strip()
-        else:
-            print("Invalid choice. Please enter a valid option.")
-            return
-        
-        name = input("Enter Food Name: ").strip()
-        price = input("Enter Price: ").strip()
-        description = input("Enter Food Description: ").strip()
+        name = validate_input("Enter Food Name: ")
+        price = validate_price("Enter Price: ")
+        description = validate_input("Enter Food Description: ")
 
         server.addFoodItem(establishment_id, name, price, description, food_type, specific_type)
     except Exception as e:
@@ -65,35 +104,46 @@ def add_food_item():
 def update_food_item():
     try:
         show_all_food_items()
-        food_id = input("Enter Food ID to update: ").strip()
-        name = input("Enter new Food Name: ").strip()
-        price = input("Enter new Price: ").strip()
+        while True:
+            food_id = validate_food_id("Enter Food ID to update (0 to go back): ")
+            if food_id == '0':
+                return
+            price = validate_price("Enter new Price: ")
+            description = validate_input("Enter Food Description: ")
 
-        server.updateFoodItem(food_id, name, price)
+            server.updateFoodItem(food_id, price, description)
+            break
     except Exception as e:
         print(f"Error: {e}")
 
 def delete_food_item():
     try:
         show_all_food_items()
-        food_id = input("Enter Food ID to delete: ").strip()
-        server.deleteFoodItem(food_id)
+        while True:
+            food_id = validate_food_id("Enter Food ID to delete (0 to go back): ")
+            if food_id == '0':
+                return
+            server.deleteFoodItem(food_id)
+            break
     except Exception as e:
         print(f"Error: {e}")
 
 def search_food_item():
-    try:
-        search_term = input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]:").strip()
-        results = server.searchFoodItem(search_term)
-        
-        if results:
-            for result in results:
-                print(result)
-        else:
-            print("No matching food items found.")
-    except Exception as e:
-        print(f"Error: {e}")
-
+    while True:
+        try:
+            search_term = validate_input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE] (0 to go back): ")
+            if search_term == '0':
+                return
+            results = server.searchFoodItem(search_term)
+            
+            if results:
+                for result in results:
+                    print(result)
+            else:
+                print("No matching food items found.")
+        except Exception as e:
+            print(f"Error: {e}")
+            
 def home():
     while True:
         print("----------------Food Item-----------------")
