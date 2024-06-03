@@ -57,7 +57,6 @@ def add_food_item():
         description = input("Enter Food Description: ").strip()
 
         server.addFoodItem(establishment_id, name, price, description, food_type, specific_type)
-        print("Food Item added successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
@@ -69,7 +68,6 @@ def update_food_item():
         price = input("Enter new Price: ").strip()
 
         server.updateFoodItem(food_id, name, price)
-        print("Food Item updated successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
@@ -78,13 +76,12 @@ def delete_food_item():
         show_all_food_items()
         food_id = input("Enter Food ID to delete: ").strip()
         server.deleteFoodItem(food_id)
-        print("Food Item deleted successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
 def search_food_item():
     try:
-        search_term = input("Enter search term (name, price, etc.): ").strip()
+        search_term = input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]:").strip()
         results = server.searchFoodItem(search_term)
         
         if results:
@@ -125,6 +122,3 @@ def home():
                 print("Invalid option. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-
-if __name__ == "__main__":
-    home()

@@ -55,7 +55,7 @@ def delete_food_establishment():
 
 def search_food_establishment():
     try:
-        search_term = input("Enter search term [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]: ").strip()
+        search_term = input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]: ").strip()
         results = server.searchFoodEstablishment(search_term)
         if results:
             for result in results:

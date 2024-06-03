@@ -438,13 +438,32 @@ def deleteFoodItem(food_id):
     try:
         cursor = connection.cursor()
 
-        # Get the establishment_id for the food item
-        cursor.execute("SELECT establishment_id FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
-        establishment_id = cursor.fetchone()[0]
+        # Get the establishment_id and food_type for the food item
+        cursor.execute("SELECT establishment_id, food_type FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
+        result = cursor.fetchone()
         
-        # Delete the food item
-        query = "DELETE FROM FOOD_ITEM WHERE Food_id = %s"
-        cursor.execute(query, (food_id,))
+        if result is None:
+            print("Food item not found.")
+            return
+
+        establishment_id, food_type = result
+
+        # Delete associated reviews
+        cursor.execute("DELETE FROM FOOD_REVIEW WHERE food_id = %s", (food_id,))
+
+        # Determine the specific table based on food_type and delete the record
+        if food_type == 'Meat':
+            cursor.execute("DELETE FROM MEAT WHERE food_id = %s", (food_id,))
+        elif food_type == 'Vegetable':
+            cursor.execute("DELETE FROM VEGETABLE WHERE food_id = %s", (food_id,))
+        elif food_type == 'Dessert':
+            cursor.execute("DELETE FROM DESSERT WHERE food_id = %s", (food_id,))
+        else:
+            print("Unknown food type.")
+            return
+
+        # Delete the food item from FOOD_ITEM table
+        cursor.execute("DELETE FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
         
         # Update the average price
         updateAveragePrice(establishment_id, cursor)
@@ -458,6 +477,8 @@ def deleteFoodItem(food_id):
     finally:
         cursor.close()
         connection.close()
+
+
 
 #########################################################################################################
 #                                   Function for updating the food item                                  #
@@ -928,11 +949,9 @@ def updateAverageFoodItemRating(food_id, cursor):
         cursor.execute("SELECT rating FROM FOOD_ITEM WHERE food_id = %s", (food_id,))
         updated_avg_rating = cursor.fetchone()[0]
         
-        print(f"The updated average rating for establishment ID {food_id} is {updated_avg_rating}")
+        print(f"The updated average rating for food ID {food_id} is {updated_avg_rating}")
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
-
-    
 
 # Update food_item review
 def updateFoodItemReview(review_id, title, suggestion, rating, ):
