@@ -1,5 +1,4 @@
 import server
-import admin_menu
 import re
 import review
 from datetime import datetime
@@ -21,7 +20,7 @@ def is_valid_date(date_string):
 
 def user_signIn():
     while True:
-        email = input('Email: ').strip()
+        email = input('\nEmail: ').strip()
         if not is_valid_email(email):
             print("Invalid email format.")
             continue
@@ -50,7 +49,7 @@ def user_signIn():
 
 def admin_signIn():
     while True:
-        email = input('Email: ').strip()
+        email = input('\nEmail: ').strip()
         if not is_valid_email(email):
             print("Invalid email format.")
             continue
@@ -72,7 +71,7 @@ def admin_signIn():
 
 def signUp():
     while True:
-        first_name = input('First Name: ').strip()
+        first_name = input('\nFirst Name: ').strip()
         if not first_name:
             print("First Name cannot be empty.")
             continue
@@ -117,7 +116,7 @@ def signUp():
 
 def start():
     while True:
-        print("------------------Welcome-----------------")
+        print("\n------------------Welcome-----------------")
         print("[1] User Sign In")
         print("[2] Admin Sign In")
         print("[3] Sign Up")

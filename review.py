@@ -79,8 +79,7 @@ def add_food_establishment_review(customer_id):
                 print("Invalid Input! Please enter a valid number.")
                 continue
             break
-        
-        server.addFoodEstablishmentReview(review_type, title, suggestion, rating, customer_id, establishment_id)
+        server.addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_id, establishment_id)
         return
     except Exception as e:
         print(e)

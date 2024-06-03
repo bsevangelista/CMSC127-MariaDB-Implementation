@@ -3,24 +3,26 @@ import server
 def show_all_establishments():
     establishments = server.getAllEstablishments()
     if establishments:
-        print("List of Establishments:")
+        print("\nList of Establishments:")
         print("-" * 45)
         for establishment in establishments:
             print("{:<15} {:<30}".format("["+str(establishment[0])+"]", establishment[1]))
         print("-" * 45)
     else:
         print("No establishments found.")
-
+        return("No establishments found.")
+    
 def show_all_food_items():
     food_items = server.getAllFoodItems()
     if food_items:
-        print("List of Food Items:")
+        print("\nList of Food Items:")
         print("-" * 40)
         for food_item in food_items:
             print("{:<10} {:<30}".format(food_item[0], food_item[1]))
         print("-" * 40)
     else:
         print("No food items found.")
+        return("No food items found.")
 
 def validate_input(prompt):
     while True:
