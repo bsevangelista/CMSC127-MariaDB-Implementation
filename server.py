@@ -187,7 +187,7 @@ def getAllFoodItems():
 #########################################################################################################
 #                               Function for adding a food establishment                                #
 #########################################################################################################
-def addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating=0, average_price=0):
+def addFoodEstablishment(name, barangay, postal_code, street_name, city, province, average_rating=0, average_price=0):
     connection = dbConnection()
 
     if connection is None:
@@ -198,11 +198,11 @@ def addFoodEstablishment(name, barangay, postal_code, street_name, city, provinc
         cursor = connection.cursor()
 
         query = """
-        INSERT INTO FOOD_ESTABLISHMENT (name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, average_price)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO FOOD_ESTABLISHMENT (name, barangay, postal_code, street_name, city, province, average_rating, average_price)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
-        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, average_price))
+        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, average_rating, average_price))
         connection.commit()
         
         print("Food Establishment added successfully!")
@@ -217,7 +217,7 @@ def addFoodEstablishment(name, barangay, postal_code, street_name, city, provinc
 #########################################################################################################
 #                               Function for updating a food establishment                             #
 #########################################################################################################
-def updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served):
+def updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -228,11 +228,11 @@ def updateFoodEstablishment(establishment_id, name, barangay, postal_code, stree
         
         query = """
         UPDATE FOOD_ESTABLISHMENT
-        SET name = %s, barangay = %s, postal_code = %s, street_name = %s, city = %s, province = %s, type_of_food_served = %s
+        SET name = %s, barangay = %s, postal_code = %s, street_name = %s, city = %s, province = %s
         WHERE Establishment_id = %s
         """
         
-        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, type_of_food_served, establishment_id))
+        cursor.execute(query, (name, barangay, postal_code, street_name, city, province, establishment_id))
         connection.commit()
         
         # Compute and update the average price
@@ -332,9 +332,9 @@ def updateAveragePrice(establishment_id, cursor):
         
         # Fetch the updated average price to verify the update
         cursor.execute("SELECT average_price FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s", (establishment_id,))
-        updated_avg_price = cursor.fetchone()[0]
+        cursor.fetchone()[0]
         
-        print(f"The updated average price for establishment ID {establishment_id} is {updated_avg_price}")
+        #print(f"The updated average price for establishment ID {establishment_id} is {updated_avg_price}")
     except mariaDB.Error as e:
         print(f"Error in updating average price: {e}")
 
@@ -492,7 +492,7 @@ def deleteFoodItem(food_id):
 #########################################################################################################
 #                                   Function for updating the food item                                  #
 #########################################################################################################
-def updateFoodItem(food_id, name, price):
+def updateFoodItem(food_id, price, description):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -503,11 +503,11 @@ def updateFoodItem(food_id, name, price):
         
         query = """
         UPDATE FOOD_ITEM
-        SET name = %s, price = %s
+        SET price = %s, description = %s
         WHERE Food_id = %s
         """
         
-        cursor.execute(query, (name, price, food_id))
+        cursor.execute(query, (price, description, food_id))
 
         # Get the establishment_id for the food item
         cursor.execute("SELECT establishment_id FROM FOOD_ITEM WHERE Food_id = %s", (food_id,))
@@ -755,9 +755,9 @@ def updateAverageRating(establishment_id, cursor):
         
         # Fetch the updated average rating to verify the update
         cursor.execute("SELECT average_rating FROM FOOD_ESTABLISHMENT WHERE establishment_id = %s", (establishment_id,))
-        updated_avg_rating = cursor.fetchone()[0]
+        cursor.fetchone()[0]
         
-        print(f"The updated average rating for establishment ID {establishment_id} is {updated_avg_rating}")
+        #print(f"The updated average rating for establishment ID {establishment_id} is {updated_avg_rating}")
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
 
@@ -956,9 +956,9 @@ def updateAverageFoodItemRating(food_id, cursor):
         
         # Fetch the updated average rating to verify the update
         cursor.execute("SELECT rating FROM FOOD_ITEM WHERE food_id = %s", (food_id,))
-        updated_avg_rating = cursor.fetchone()[0]
+        cursor.fetchone()[0]
         
-        print(f"The updated average rating for food ID {food_id} is {updated_avg_rating}")
+        #print(f"The updated average rating for food ID {food_id} is {updated_avg_rating}")
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
 

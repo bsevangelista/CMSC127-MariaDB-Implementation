@@ -64,10 +64,10 @@ def update_food_item():
     try:
         show_all_food_items()
         food_id = input("Enter Food ID to update: ").strip()
-        name = input("Enter new Food Name: ").strip()
         price = input("Enter new Price: ").strip()
+        description = input("Enter Food Description: ").strip()
 
-        server.updateFoodItem(food_id, name, price)
+        server.updateFoodItem(food_id, price, description)
     except Exception as e:
         print(f"Error: {e}")
 
