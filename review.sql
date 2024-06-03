@@ -96,4 +96,3 @@ CREATE TABLE DESSERT (
     FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
     PRIMARY KEY (food_id, dessert_type)
 );
-
