@@ -32,9 +32,9 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     city VARCHAR(100) NOT NULL,
     province VARCHAR(100) NOT NULL,
     average_rating DECIMAL(2,1) NOT NULL DEFAULT 0, -- Initial value set to 0
-    average_price DECIMAL(6,2) NOT NULL DEFAULT 0, -- Initial value set to 0
+    average_price DECIMAL(6,2) NOT NULL DEFAULT 0 -- Initial value set to 0
 );
-w
+
 -- Table for FOOD_ITEM
 CREATE TABLE FOOD_ITEM (
     food_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -64,14 +64,6 @@ CREATE TABLE FOOD_REVIEW (
     FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id)
 );
 
--- Table for FOOD_ITEM_INGREDIENT
-CREATE TABLE FOOD_ITEM_INGREDIENT (
-    food_id INT,
-    ingredient VARCHAR(100),
-    FOREIGN KEY (food_id) REFERENCES FOOD_ITEM(food_id),
-    PRIMARY KEY (food_id, ingredient)
-);
-
 -- Table for MEAT
 CREATE TABLE MEAT (
     food_id INT,
@@ -96,3 +88,5 @@ CREATE TABLE DESSERT (
     PRIMARY KEY (food_id, dessert_type)
 );
 
+INSERT INTO ADMIN (email, password, first_name, last_name) VALUES
+('admin@admin.com', 'adminadmin', 'Admin', 'One');
