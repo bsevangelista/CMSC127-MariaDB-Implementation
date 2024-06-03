@@ -743,25 +743,28 @@ def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, est
 # AVERAGE THE FOOD_ESTABLISHMENT REVIEW
 def updateAverageRating(establishment_id, cursor):
     try:
-
+        # Establish a new connection
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return False
 
         # Update the average rating in the FOOD_ESTABLISHMENT table
         update_query = """
         UPDATE FOOD_ESTABLISHMENT 
-        SET average_rating = (SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s) 
+        SET average_rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s), 0)
         WHERE establishment_id = %s
         """
 
-        
         cursor.execute(update_query, (establishment_id, establishment_id))
-        
-        # Fetch the updated average rating to verify the update
-        cursor.execute("SELECT average_rating FROM FOOD_ESTABLISHMENT WHERE establishment_id = %s", (establishment_id,))
-        cursor.fetchone()[0]
-        
-        #print(f"The updated average rating for establishment ID {establishment_id} is {updated_avg_rating}")
+        connection.commit()
+        print("Average rating updated successfully!")
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
 
             
 def getReviewsByCustomerId(customer_id):
@@ -949,20 +952,27 @@ def addFoodItemReview(type, title, suggestion, rating, customer_id, establishmen
 
 def updateAverageFoodItemRating(food_id, cursor):
     try:
+        # Establish a new connection
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return False
+
+        # Update the average rating in the FOOD_ITEM table
         update_query = """
         UPDATE FOOD_ITEM 
-        SET rating = (SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s) 
+        SET rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s), 0)
         WHERE food_id = %s
         """
         cursor.execute(update_query, (food_id, food_id))
-        
-        # Fetch the updated average rating to verify the update
-        cursor.execute("SELECT rating FROM FOOD_ITEM WHERE food_id = %s", (food_id,))
-        cursor.fetchone()[0]
-        
-        #print(f"The updated average rating for food ID {food_id} is {updated_avg_rating}")
+        connection.commit()
+        print("Average rating for food item updated successfully!")
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
 
 # Update food_item review
 def updateFoodItemReview(review_id, title, suggestion, rating, ):
