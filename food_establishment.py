@@ -80,7 +80,9 @@ def delete_food_establishment():
 
 def search_food_establishment():
     try:
-        search_term = validate_input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]: ")
+        search_term = validate_input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE] (0 to go back): ")
+        if search_term == '0':
+            return
         results = server.searchFoodEstablishment(search_term)
         if results:
             for result in results:

@@ -743,6 +743,8 @@ def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, est
 # AVERAGE THE FOOD_ESTABLISHMENT REVIEW
 def updateAverageRating(establishment_id, cursor):
     try:
+
+
         # Update the average rating in the FOOD_ESTABLISHMENT table
         update_query = """
         UPDATE FOOD_ESTABLISHMENT 
