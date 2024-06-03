@@ -7,7 +7,7 @@ def dbConnection():
             password='admin',
             host='localhost',  
             port=3306,         
-            database='FoodReviewDB'  
+            database='TestDB'  
         )
         return connection
     except mariaDB.Error as e:
@@ -234,12 +234,6 @@ def updateFoodEstablishment(establishment_id, name, barangay, postal_code, stree
         
         cursor.execute(query, (name, barangay, postal_code, street_name, city, province, establishment_id))
         connection.commit()
-        
-        # Compute and update the average price
-        updateAveragePrice(establishment_id, cursor)
-        
-        # Compute and update the rating
-        updateAverageRating(establishment_id, cursor)
         
         print("Food Establishment updated successfully!")
     
