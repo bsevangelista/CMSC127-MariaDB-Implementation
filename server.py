@@ -426,7 +426,9 @@ def addFoodItem(establishment_id, name, price, description, food_type,specific_t
     finally:
         cursor.close()
         connection.close()
-
+#########################################################################################################
+#                                   Function for deleting the food item                                 #
+#########################################################################################################
 def deleteFoodItem(food_id):
     connection = dbConnection()
     if connection is None:
@@ -457,6 +459,9 @@ def deleteFoodItem(food_id):
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                   Function for updating the food item                                  #
+#########################################################################################################
 def updateFoodItem(food_id, name, price):
     connection = dbConnection()
     if connection is None:
@@ -491,7 +496,9 @@ def updateFoodItem(food_id, name, price):
         cursor.close()
         connection.close()
 
-
+#########################################################################################################
+#                                   Function for searching the food item                                #
+#########################################################################################################
 def searchFoodItem(search_term):
     connection = dbConnection()
     if connection is None:
@@ -522,7 +529,7 @@ def searchFoodItem(search_term):
 
 #########################################################################################################
 #                                                                                                       #
-#                               FOOD REVIEW FUNCTIONS                                                   #
+#                                        FOOD REVIEW FUNCTIONS                                          #
 #                                                                                                       #
 #########################################################################################################
 def getFoodEstablishmentName():
@@ -671,7 +678,9 @@ def getItemIdByName(item_name, establishment_id):
         cursor.close()
         connection.close()
         
-# ADD FOOD_ESTABLISHMENT REVIEW
+#########################################################################################################
+#                                   Function for adding the food establishment review                   #
+#########################################################################################################
 def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, establishment_id):
     connection = dbConnection()
     if connection is None:
@@ -710,6 +719,8 @@ def updateAverageRating(establishment_id, cursor):
         SET average_rating = (SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s) 
         WHERE establishment_id = %s
         """
+
+        
         cursor.execute(update_query, (establishment_id, establishment_id))
         
         # Fetch the updated average rating to verify the update
