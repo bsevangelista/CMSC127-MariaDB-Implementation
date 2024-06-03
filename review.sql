@@ -44,7 +44,7 @@ CREATE TABLE FOOD_ITEM (
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     establishment_id INT,
-    food_type VARCHAR(255) NULL,
+    food_type VARCHAR(255)
     FOREIGN KEY (establishment_id) REFERENCES FOOD_ESTABLISHMENT(establishment_id)
 );
 
