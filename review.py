@@ -166,7 +166,7 @@ def add_food_item_review(customer_id):
                 continue
             break
         
-        server.addFoodItemReview(review_type, title, suggestion, rating, customer_id, establishment_id, item_id)
+        server.addFoodItemReview(review_type, rating, title, suggestion, customer_id, establishment_id, item_id)
         return
     except Exception as e:
         print(e)

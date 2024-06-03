@@ -517,7 +517,6 @@ def home ():
         choice = input("Select an option: ")
         
         if choice == '0':
-            print("Logging out...")
             break
         elif choice == '1':
             report_one()

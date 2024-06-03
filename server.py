@@ -732,8 +732,8 @@ def addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_
         """
         
         cursor.execute(query, (review_type, rating, title, suggestion, customer_id, establishment_id))
-        updateAverageRating(establishment_id, cursor)
         connection.commit()
+        updateAverageRating(establishment_id, cursor)
         print("Review added successfully!")
     
     except mariaDB.Error as e:
@@ -747,12 +747,20 @@ def addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_
 # AVERAGE THE FOOD_ESTABLISHMENT REVIEW
 def updateAverageRating(establishment_id, cursor):
     try:
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to database")
+            return False
+    
+        cursor = connection.cursor()
+        
         update_query = """
         UPDATE FOOD_ESTABLISHMENT 
         SET average_rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE establishment_id = %s), 0)
         WHERE establishment_id = %s
         """
         cursor.execute(update_query, (establishment_id, establishment_id))
+        connection.commit()
         #print("Average rating updated successfully!")
         
     except mariaDB.Error as e:
@@ -901,11 +909,10 @@ def deleteReview(review_id):
         # Delete the review
         query = "DELETE FROM FOOD_REVIEW WHERE review_id = %s"
         cursor.execute(query, (review_id,))
+        connection.commit()
         
         # Update the average rating
         updateAverageRating(establishment_id, cursor)
-        
-        connection.commit()
         print("Review deleted successfully!")
         return True
     
@@ -918,13 +925,13 @@ def deleteReview(review_id):
         connection.close()
 ###############################################################
 # Add food_item review
-def addFoodItemReview(type, title, suggestion, rating, customer_id, establishment_id, food_id):
-    connection = dbConnection()
-    if connection is None:
-        print("Failed to connect to the database.")
-        return
-    
+def addFoodItemReview(review_type, rating, title, suggestion, customer_id, establishment_id, item_id):
     try:
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return
+        
         cursor = connection.cursor()
         
         query = """
@@ -932,11 +939,11 @@ def addFoodItemReview(type, title, suggestion, rating, customer_id, establishmen
         VALUES (CURDATE(), CURTIME(), %s, %s, %s, %s, %s, %s, %s)
         """
         
-        cursor.execute(query, (type, rating, title, suggestion, customer_id, establishment_id, food_id))
-        updateAverageFoodItemRating(food_id, cursor)
-        updateAverageRating(establishment_id, cursor)
+        cursor.execute(query, (review_type, rating, title, suggestion, customer_id, establishment_id, item_id))
         connection.commit()
-        #print("Review added successfully!")
+        updateAverageFoodItemRating(item_id, cursor)
+        updateAverageRating(establishment_id, cursor)
+        print("Review added successfully!")
         
     except mariaDB.Error as e:
         print(f"Error: {e}")
@@ -947,17 +954,28 @@ def addFoodItemReview(type, title, suggestion, rating, customer_id, establishmen
 
 def updateAverageFoodItemRating(food_id, cursor):
     try:
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to database")
+            return False
+        
+        cursor = connection.cursor()
+        
         update_query = """
         UPDATE FOOD_ITEM 
         SET rating = COALESCE((SELECT AVG(rating) FROM FOOD_REVIEW WHERE food_id = %s), 0)
         WHERE food_id = %s
         """
         cursor.execute(update_query, (food_id, food_id))
+        connection.commit()
         #print("Average rating for food item updated successfully!")
         
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
-#####################################################################################
+        
+    finally:
+            cursor.close()
+            connection.close()
 
 # Update food_item review
 def updateFoodItemReview(review_id, title, suggestion, rating, ):
