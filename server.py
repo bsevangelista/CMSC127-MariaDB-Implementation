@@ -4,10 +4,10 @@ def dbConnection():
     try:
         connection = mariaDB.connect(
             user='root',
-            password='trixiabanzon',
+            password='admin',
             host='localhost',  
             port=3306,         
-            database='foodreviewdb'  
+            database='FoodReviewDB'  
         )
         return connection
     except mariaDB.Error as e:
@@ -711,7 +711,7 @@ def getItemIdByName(item_name, establishment_id):
 #########################################################################################################
 #                                   Function for adding the food establishment review                   #
 #########################################################################################################
-def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, establishment_id):
+def addFoodEstablishmentReview(review_type, rating, title, suggestion, customer_id, establishment_id):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -721,11 +721,11 @@ def addFoodEstablishmentReview(type, title, suggestion, rating, customer_id, est
         cursor = connection.cursor()
         
         query = """
-        INSERT INTO FOOD_REVIEW (review_date, review_time, Type_of_review, rating, title, suggestion, customer_id, establishment_id)
+        INSERT INTO FOOD_REVIEW (review_date, review_time, type_of_review, rating, title, suggestion, customer_id, establishment_id)
         VALUES (CURDATE(), CURTIME(), %s, %s, %s, %s, %s, %s)
         """
         
-        cursor.execute(query, (type, rating, title, suggestion, customer_id, establishment_id))
+        cursor.execute(query, (review_type, rating, title, suggestion, customer_id, establishment_id))
         updateAverageRating(establishment_id, cursor)
         
         connection.commit()
@@ -761,7 +761,7 @@ def updateAverageRating(establishment_id, cursor):
     except mariaDB.Error as e:
         print(f"Error in updating average rating: {e}")
 
-            
+
 def getReviewsByCustomerId(customer_id):
     connection = dbConnection()
     if connection is None:
