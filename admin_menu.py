@@ -19,7 +19,3 @@ def admin_menu():
             food_item.home()  # Redirect to the food item management menu
         else:
             print("Invalid option. Please try again.")
-
-# Entry point for testing
-if __name__ == "__main__":
-    admin_menu()

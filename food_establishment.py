@@ -1,8 +1,19 @@
 import server
-
+def show_all_establishments():
+    establishments = server.getAllEstablishments()
+    if establishments:
+        print("-" * 45)
+        print("------------Food Establishment List------------")
+        print("-" * 45)
+        for establishment in establishments:
+            print("{:<15} {:<30}".format("["+str(establishment[0])+"]", establishment[1]))
+        print("-" * 45)
+    else:
+        print("No establishments found.")
 
 def add_food_establishment():
     try:
+        show_all_establishments()
         name = input("Enter Establishment Name: ").strip()
         barangay = input("Enter Barangay: ").strip()
         postal_code = input("Enter Postal Code: ").strip()
@@ -15,12 +26,12 @@ def add_food_establishment():
         average_price = 0
 
         server.addFoodEstablishment(name, barangay, postal_code, street_name, city, province, type_of_food_served, average_rating, average_price)
-        print("Food Establishment added successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
 def update_food_establishment():
     try:
+        show_all_establishments()
         establishment_id = input("Enter Establishment ID to update: ").strip()
         name = input("Enter new Establishment Name: ").strip()
         barangay = input("Enter new Barangay: ").strip()
@@ -31,21 +42,20 @@ def update_food_establishment():
         type_of_food_served = input("Enter new Food Type Served: ").strip()
 
         server.updateFoodEstablishment(establishment_id, name, barangay, postal_code, street_name, city, province, type_of_food_served)
-        print("Food Establishment updated successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
 def delete_food_establishment():
     try:
+        show_all_establishments()
         establishment_id = input("Enter Establishment ID to delete: ").strip()
         server.deleteFoodEstablishment(establishment_id)
-        print("Food Establishment deleted successfully!")
     except Exception as e:
         print(f"Error: {e}")
 
 def search_food_establishment():
     try:
-        search_term = input("Enter search term (name, city, etc.): ").strip()
+        search_term = input("Enter search term - [NAME][PROVINCE][CITY][STREET][BARANGAY][POSTAL CODE]: ").strip()
         results = server.searchFoodEstablishment(search_term)
         if results:
             for result in results:
@@ -83,7 +93,7 @@ def home():
                 search_food_establishment()
             elif choice == 5:
                 print("Display Food Establishments selected.")
-                display_food_establishment()
+                show_all_establishments()
             else:
                 print("Invalid option. Please try again.")
         except ValueError:

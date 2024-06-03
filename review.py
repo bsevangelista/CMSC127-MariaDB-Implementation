@@ -307,5 +307,3 @@ def home(customer_id):
         else:
             print("Invalid option. Please try again.")
         
-# for testing only
-# home(6)
