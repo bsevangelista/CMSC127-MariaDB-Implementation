@@ -148,7 +148,42 @@ def checkEmailExists(email):
         cursor.close()
         connection.close()
 
+#########################################################################################################
+#                                          Getting Estabs and Food Items                                #
+#########################################################################################################
+def getAllEstablishments():
+    connection = dbConnection()
+    if connection is None:
+        return []
 
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT establishment_id, name FROM FOOD_ESTABLISHMENT")
+        establishments = cursor.fetchall()
+        return establishments
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return []
+    finally:
+        cursor.close()
+        connection.close()
+
+def getAllFoodItems():
+    connection = dbConnection()
+    if connection is None:
+        return []
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT food_id, name FROM FOOD_ITEM")
+        food_items = cursor.fetchall()
+        return food_items
+    except mariaDB.Error as e:
+        print(f"Error: {e}")
+        return []
+    finally:
+        cursor.close()
+        connection.close()
 #########################################################################################################
 #                               Function for adding a food establishment                                #
 #########################################################################################################
@@ -348,7 +383,7 @@ def isEstablishmentExists(establishment_id):
 #########################################################################################################
 #                                   Function for adding the food item                                   #
 #########################################################################################################
-def addFoodItem(establishment_id, name, price, description):
+def addFoodItem(establishment_id, name, price, description, food_type,specific_type):
     connection = dbConnection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -356,19 +391,33 @@ def addFoodItem(establishment_id, name, price, description):
     
     try:
         cursor = connection.cursor()
-
-        # Insert the new food item
+        
         query = """
-        INSERT INTO FOOD_ITEM (establishment_id, name, price, description)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO FOOD_ITEM (establishment_id, name, price, description, food_type)
+        VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (establishment_id, name, price, description))
+        
+        cursor.execute(query, (establishment_id, name, price, description, food_type))
+
+        # Get the last inserted food_id
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        food_id = cursor.fetchone()[0]
+        
+        # Insert into the specific table based on food_type
+        if food_type == 'Meat':
+            specific_query = "INSERT INTO MEAT (food_id, meat_type) VALUES (%s, %s)"
+            cursor.execute(specific_query, (food_id, specific_type))
+        elif food_type == 'Vegetable':
+            specific_query = "INSERT INTO VEGETABLE (food_id, vegetable_type) VALUES (%s, %s)"
+            cursor.execute(specific_query, (food_id, specific_type))
+        elif food_type == 'Dessert':
+            specific_query = "INSERT INTO DESSERT (food_id, dessert_type) VALUES (%s, %s)"
+            cursor.execute(specific_query, (food_id, specific_type))
 
         # Update the average price after adding a new food item
         updateAveragePrice(establishment_id, cursor)
 
-        connection.commit()  # Commit the transaction here
-    
+        connection.commit()
         print("Food Item added successfully!")
     
     except mariaDB.Error as e:
@@ -377,8 +426,6 @@ def addFoodItem(establishment_id, name, price, description):
     finally:
         cursor.close()
         connection.close()
-
-
 
 def deleteFoodItem(food_id):
     connection = dbConnection()
