@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS FoodReviewDB;
-USE FoodReviewDB;
+CREATE DATABASE IF NOT EXISTS reviewsystemdb;
+USE reviewsystemdb;
 
 -- Table for ADMIN
 CREATE TABLE ADMIN (
