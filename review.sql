@@ -28,7 +28,7 @@ CREATE TABLE FOOD_ESTABLISHMENT (
     name VARCHAR(100) NOT NULL,
     barangay VARCHAR(100) NOT NULL,
     postal_code VARCHAR(25) NOT NULL,
-    street VARCHAR(100) NOT NULL,
+    street_name VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     province VARCHAR(100) NOT NULL,
     rating DECIMAL(2,1) DEFAULT 0, -- Initial value set to 0
@@ -44,6 +44,7 @@ CREATE TABLE FOOD_ITEM (
     name VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     establishment_id INT,
+    food_type VARCHAR(255)
     FOREIGN KEY (establishment_id) REFERENCES FOOD_ESTABLISHMENT(establishment_id)
 );
 
