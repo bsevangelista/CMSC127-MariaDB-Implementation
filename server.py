@@ -322,21 +322,27 @@ def searchFoodEstablishment(search_term):
 #########################################################################################################
 def updateAveragePrice(establishment_id, cursor):
     try:
+        # Establish a new connection
+        connection = dbConnection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return False
+
         # Update the average price in the FOOD_ESTABLISHMENT table
         update_query = """
         UPDATE FOOD_ESTABLISHMENT 
-        SET average_price = (SELECT AVG(price) FROM FOOD_ITEM WHERE establishment_id = %s) 
+        SET average_price = COALESCE((SELECT AVG(price) FROM FOOD_ITEM WHERE establishment_id = %s), 0)
         WHERE establishment_id = %s
         """
         cursor.execute(update_query, (establishment_id, establishment_id))
-        
-        # Fetch the updated average price to verify the update
-        cursor.execute("SELECT average_price FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s", (establishment_id,))
-        cursor.fetchone()[0]
-        
-        #print(f"The updated average price for establishment ID {establishment_id} is {updated_avg_price}")
+        connection.commit()
+        print("Average price for establishment updated successfully!")
     except mariaDB.Error as e:
         print(f"Error in updating average price: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
 
 #########################################################################################################
 #                                Function for displaying the establishments                             #
