@@ -261,12 +261,23 @@ def deleteFoodEstablishment(establishment_id):
     
     try:
         cursor = connection.cursor()
+
+        # Get all food items associated with the establishment
+        cursor.execute("SELECT Food_id FROM FOOD_ITEM WHERE establishment_id = %s", (establishment_id,))
+        food_items = cursor.fetchall()
+
+        # Delete each food item and its associated reviews
+        for food_item in food_items:
+            deleteFoodItem(food_item[0])
+
+        # Delete reviews associated with the establishment
+        cursor.execute("DELETE FROM FOOD_REVIEW WHERE establishment_id = %s", (establishment_id,))
+
+        # Delete the food establishment
+        cursor.execute("DELETE FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s", (establishment_id,))
         
-        query = "DELETE FROM FOOD_ESTABLISHMENT WHERE Establishment_id = %s"
-        
-        cursor.execute(query, (establishment_id,))
         connection.commit()
-        print("Food Establishment deleted successfully!")
+        print("Food Establishment and associated data deleted successfully!")
     
     except mariaDB.Error as e:
         print(f"Error: {e}")
@@ -477,8 +488,6 @@ def deleteFoodItem(food_id):
     finally:
         cursor.close()
         connection.close()
-
-
 
 #########################################################################################################
 #                                   Function for updating the food item                                  #
